@@ -1,15 +1,13 @@
 -- Create profiles table
 CREATE TABLE IF NOT EXISTS profiles (
     profile_id BIGSERIAL PRIMARY KEY,
-    username VARCHAR(100) NOT NULL UNIQUE,
-    roles VARCHAR(255) NOT NULL,
+    user_id BIGINT NOT NULL,
+    main_game VARCHAR(255) NOT NULL,
+    tier VARCHAR(255) NOT NULL,
     region VARCHAR(100) NOT NULL,
-    tier VARCHAR(255),
-    is_verify BOOLEAN DEFAULT FALSE
+    CONSTRAINT fk_profiles_user FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
 
-
--- Create indexs
-CREATE INDEX idx_profiles_is_verify ON profiles(is_verify);
-CREATE INDEX idx_profiles_username ON profiles(username);
-CREATE INDEX idx_profiles_profileId ON profiles(profile_id);
+-- Create indexes
+CREATE INDEX idx_profiles_user_id ON profiles(user_id);
+CREATE INDEX idx_profiles_profile_id ON profiles(profile_id);

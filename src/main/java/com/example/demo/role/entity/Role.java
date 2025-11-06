@@ -1,7 +1,7 @@
 package com.example.demo.role.entity;
 
+import com.example.demo.game.entity.Game;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "roles")
@@ -12,11 +12,9 @@ public class Role {
     @Column(name = "role_id")
     private Long roleId;
 
-    'no se si esta bien'
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "game_id")
-    private Long gameId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "game_id", nullable = false)
+    private Game game;
 
     @Column(name = "role_name", nullable = false, unique = true, length = 100)
     private String roleName;    
@@ -24,7 +22,8 @@ public class Role {
     public Role() {
     }
 
-    public Role(String roleName) {
+    public Role(Game game, String roleName) {
+        this.game = game;
         this.roleName = roleName;
     }
 
@@ -36,12 +35,12 @@ public class Role {
         this.roleId = roleId;
     }
 
-    public Long getGameId() {
-        return gameId;
+    public Game getGame() {
+        return game;
     }
 
-    public void setGameId(Long gameId) {
-        this.gameId = gameId;
+    public void setGame(Game game) {
+        this.game = game;
     }
 
     public String getRoleName() {

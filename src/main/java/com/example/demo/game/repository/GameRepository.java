@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface GameRepository extends JpaRepository<Game, Long>, JpaSpecificationExecutor<Game> {
 
-    Optional<Game> findByName(String gameName);
+    Optional<Game> findByGameName(String gameName);
 
-    boolean existsByName(String gameName);
+    boolean existsByGameName(String gameName);
 }
