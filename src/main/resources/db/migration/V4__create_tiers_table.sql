@@ -2,7 +2,8 @@
 CREATE TABLE IF NOT EXISTS tiers (
     tier_id BIGSERIAL PRIMARY KEY,
     game_id BIGINT NOT NULL REFERENCES games(game_id),
-    tier_name VARCHAR(100) NOT NULL UNIQUE
+    tier_name VARCHAR(100) NOT NULL UNIQUE,
+    rank INTEGER NOT NULL DEFAULT 0
 );
 
 -- Create indexes

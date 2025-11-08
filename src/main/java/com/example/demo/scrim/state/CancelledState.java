@@ -10,9 +10,18 @@ public class CancelledState implements ScrimState {
     }
 
     @Override
-    public void handle(Scrim context) {
-        // Lógica específica del estado Cancelled
-        // Estado final, no hay transiciones
+    public void apply(Scrim context) {
+        unsupportedOperation("apply");
+    }
+
+    @Override
+    public void cancel(Scrim context) {
+        unsupportedOperation("cancel");
+    }
+
+    @Override
+    public void finish(Scrim context) {
+        unsupportedOperation("finish");
     }
 }
 

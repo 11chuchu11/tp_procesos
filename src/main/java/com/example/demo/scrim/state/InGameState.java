@@ -1,6 +1,8 @@
 package com.example.demo.scrim.state;
 
+import com.example.demo.enums.ScrimStatus;
 import com.example.demo.scrim.entity.Scrim;
+import com.example.demo.scrim.factory.ScrimStateFactory;
 
 public class InGameState implements ScrimState {
     
@@ -10,10 +12,19 @@ public class InGameState implements ScrimState {
     }
 
     @Override
-    public void handle(Scrim context) {
-        // Lógica específica del estado InGame
-        // Transición al siguiente estado si es necesario
-        // context.setState(new FinishedState());
+    public void apply(Scrim context) {
+        unsupportedOperation("apply");
+    }
+
+    @Override
+    public void cancel(Scrim context) {
+        unsupportedOperation("cancel");
+    }
+
+    @Override
+    public void finish(Scrim context) {
+        context.setState(ScrimStateFactory.fromStatus(ScrimStatus.FINISHED));
+        System.out.println("Scrim finished successfully");
     }
 }
 
