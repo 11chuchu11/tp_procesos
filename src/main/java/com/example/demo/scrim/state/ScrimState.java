@@ -7,6 +7,9 @@ public interface ScrimState {
     void apply(Scrim context) throws IllegalStateException;
     void cancel(Scrim context) throws IllegalStateException;
     void finish(Scrim context) throws IllegalStateException;
+    void lobbyFilled(Scrim context) throws IllegalStateException;
+    void allPlayersConfirmed(Scrim context) throws IllegalStateException;
+    void start(Scrim context) throws IllegalStateException;
     
     default void unsupportedOperation(String operation) {
         throw new IllegalStateException(

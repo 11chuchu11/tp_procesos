@@ -161,7 +161,7 @@ public class ScrimService {
         savedScrim = scrimRepository.save(savedScrim);
 
         if (savedScrim.isLobbyFull()) {
-            savedScrim.setState(ScrimStateFactory.fromStatus(ScrimStatus.LOBBYREADY));
+            savedScrim.lobbyFilled();
             savedScrim = scrimRepository.save(savedScrim);
             createConfirmationRecords(savedScrim);
         }
@@ -253,11 +253,7 @@ public class ScrimService {
         confirmationRepository.save(confirmation);
 
         if (allPlayersConfirmed(scrim)) {
-            if (scrim.isScheduledTimeReached()) {
-                scrim.setState(ScrimStateFactory.fromStatus(ScrimStatus.INGAME));
-            } else {
-                scrim.setState(ScrimStateFactory.fromStatus(ScrimStatus.CONFIRMED));
-            }
+            scrim.allPlayersConfirmed();
             scrim = scrimRepository.save(scrim);
         }
 
@@ -327,8 +323,12 @@ public class ScrimService {
                     "Scrim must be in CONFIRMED state to start. Current status: " + scrim.getStatus());
         }
 
-        scrim.setState(ScrimStateFactory.fromStatus(ScrimStatus.INGAME));
-        scrim = scrimRepository.save(scrim);
+        try {
+            scrim.start();
+            scrim = scrimRepository.save(scrim);
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Cannot start scrim: " + e.getMessage());
+        }
 
         return toResponse(scrim);
     }

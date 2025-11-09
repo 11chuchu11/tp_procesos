@@ -5,7 +5,7 @@ import com.example.demo.scrim.entity.Scrim;
 import com.example.demo.scrim.factory.ScrimStateFactory;
 
 public class LobbyReadyState implements ScrimState {
-    
+
     @Override
     public String getStateName() {
         return "LOBBYREADY";
@@ -26,5 +26,25 @@ public class LobbyReadyState implements ScrimState {
     public void finish(Scrim context) {
         unsupportedOperation("finish");
     }
-}
 
+    @Override
+    public void lobbyFilled(Scrim context) {
+        unsupportedOperation("lobby full");
+    }
+
+    @Override
+    public void allPlayersConfirmed(Scrim context) {
+        if (context.isScheduledTimeReached()) {
+            context.setState(ScrimStateFactory.fromStatus(ScrimStatus.INGAME));
+            System.out.println("All players confirmed and time reached, starting game");
+        } else {
+            context.setState(ScrimStateFactory.fromStatus(ScrimStatus.CONFIRMED));
+            System.out.println("All players confirmed, waiting for scheduled time");
+        }
+    }
+
+    @Override
+    public void start(Scrim context) {
+        unsupportedOperation("start");
+    }
+}

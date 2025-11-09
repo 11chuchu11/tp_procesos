@@ -26,5 +26,21 @@ public class SearchingState implements ScrimState {
     public void finish(Scrim context) {
         unsupportedOperation("finish");
     }
+
+    @Override
+    public void lobbyFilled(Scrim context) {
+        context.setState(ScrimStateFactory.fromStatus(ScrimStatus.LOBBYREADY));
+        System.out.println("Lobby is now full! Moving to LOBBYREADY state");
+    }
+
+    @Override
+    public void allPlayersConfirmed(Scrim context) {
+        unsupportedOperation("confirm players");
+    }
+
+    @Override
+    public void start(Scrim context) {
+        unsupportedOperation("start");
+    }
 }
 

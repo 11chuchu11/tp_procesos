@@ -120,14 +120,26 @@ public class Scrim {
         this.state.finish(this);
     }
 
+    public void lobbyFilled() {
+        this.state.lobbyFilled(this);
+    }
+
+    public void allPlayersConfirmed() {
+        this.state.allPlayersConfirmed(this);
+    }
+
+    public void start() {
+        this.state.start(this);
+    }
+
     public boolean addPlayerToLobby(Profile profile) {
         if (lobby == null) {
             return false;
         }
         boolean added = lobby.addProfileRandomly(profile);
 
-        if (added && isLobbyFull() && status == ScrimStatus.SEARCHING) {
-            setState(ScrimStateFactory.fromStatus(ScrimStatus.LOBBYREADY));
+        if (added && isLobbyFull()) {
+            lobbyFilled();
         }
 
         return added;

@@ -26,4 +26,20 @@ public class ConfirmedState implements ScrimState {
     public void finish(Scrim context) {
         unsupportedOperation("finish");
     }
+
+    @Override
+    public void lobbyFilled(Scrim context) {
+        unsupportedOperation("lobby full");
+    }
+
+    @Override
+    public void allPlayersConfirmed(Scrim context) {
+        unsupportedOperation("confirm players");
+    }
+
+    @Override
+    public void start(Scrim context) {
+        context.setState(ScrimStateFactory.fromStatus(ScrimStatus.INGAME));
+        System.out.println("Starting scrim, moving to INGAME state");
+    }
 }

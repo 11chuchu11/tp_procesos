@@ -5,7 +5,7 @@ import com.example.demo.scrim.entity.Scrim;
 import com.example.demo.scrim.factory.ScrimStateFactory;
 
 public class InGameState implements ScrimState {
-    
+
     @Override
     public String getStateName() {
         return "INGAME";
@@ -26,5 +26,19 @@ public class InGameState implements ScrimState {
         context.setState(ScrimStateFactory.fromStatus(ScrimStatus.FINISHED));
         System.out.println("Scrim finished successfully");
     }
-}
 
+    @Override
+    public void lobbyFilled(Scrim context) {
+        unsupportedOperation("lobby full");
+    }
+
+    @Override
+    public void allPlayersConfirmed(Scrim context) {
+        unsupportedOperation("confirm players");
+    }
+
+    @Override
+    public void start(Scrim context) {
+        unsupportedOperation("start");
+    }
+}
