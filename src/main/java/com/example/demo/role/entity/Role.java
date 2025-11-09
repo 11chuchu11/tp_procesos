@@ -4,7 +4,7 @@ import com.example.demo.game.entity.Game;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "roles")
+@Table(name = "roles", uniqueConstraints = @UniqueConstraint(columnNames = { "game_id", "role_name" }))
 public class Role {
 
     @Id
@@ -16,8 +16,8 @@ public class Role {
     @JoinColumn(name = "game_id", nullable = false)
     private Game game;
 
-    @Column(name = "role_name", nullable = false, unique = true, length = 100)
-    private String roleName;    
+    @Column(name = "role_name", nullable = false, length = 100)
+    private String roleName;
 
     public Role() {
     }

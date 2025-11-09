@@ -7,3 +7,4 @@ CREATE TABLE IF NOT EXISTS teams (
 
 -- Create indexes
 CREATE INDEX idx_teams_lobby_id ON teams(lobby_id);
+

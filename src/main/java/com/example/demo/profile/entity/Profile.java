@@ -1,6 +1,8 @@
 package com.example.demo.profile.entity;
 
 import com.example.demo.enums.ProfileStatus;
+import com.example.demo.game.entity.Game;
+import com.example.demo.tier.entity.Tier;
 import com.example.demo.user.entity.User;
 import jakarta.persistence.*;
 
@@ -17,14 +19,17 @@ public class Profile {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "main_game", nullable = false, length = 255)
-    private String mainGame;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "main_game_id", nullable = false)
+    private Game mainGame;
 
-    @Column(name = "tier", nullable = false, length = 255)
-    private String tier;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "main_tier_id", nullable = false)
+    private Tier mainTier;
 
-    @Column(name = "region", nullable = false, length = 100)
-    private String region;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id", nullable = false)
+    private com.example.demo.region.entity.Region region;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -34,10 +39,10 @@ public class Profile {
         this.status = ProfileStatus.AVAILABLE;
     }
 
-    public Profile(User user, String mainGame, String tier, String region) {
+    public Profile(User user, Game mainGame, Tier mainTier, com.example.demo.region.entity.Region region) {
         this.user = user;
         this.mainGame = mainGame;
-        this.tier = tier;
+        this.mainTier = mainTier;
         this.region = region;
         this.status = ProfileStatus.AVAILABLE;
     }
@@ -58,27 +63,27 @@ public class Profile {
         this.user = user;
     }
 
-    public String getMainGame() {
+    public Game getMainGame() {
         return mainGame;
     }
 
-    public void setMainGame(String mainGame) {
+    public void setMainGame(Game mainGame) {
         this.mainGame = mainGame;
     }
 
-    public String getTier() {
-        return tier;
+    public Tier getMainTier() {
+        return mainTier;
     }
 
-    public void setTier(String tier) {
-        this.tier = tier;
+    public void setMainTier(Tier mainTier) {
+        this.mainTier = mainTier;
     }
 
-    public String getRegion() {
+    public com.example.demo.region.entity.Region getRegion() {
         return region;
     }
 
-    public void setRegion(String region) {
+    public void setRegion(com.example.demo.region.entity.Region region) {
         this.region = region;
     }
 

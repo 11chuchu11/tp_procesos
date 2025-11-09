@@ -6,6 +6,8 @@ import com.example.demo.game.entity.Game;
 import com.example.demo.game.repository.GameRepository;
 import com.example.demo.profile.entity.Profile;
 import com.example.demo.profile.repository.ProfileRepository;
+import com.example.demo.region.entity.Region;
+import com.example.demo.region.repository.RegionRepository;
 import com.example.demo.scrim.dto.PlayerConfirmationInfo;
 import com.example.demo.scrim.dto.ScrimResponse;
 import com.example.demo.scrim.dto.ScrimSearchRequest;
@@ -16,6 +18,8 @@ import com.example.demo.scrim.repository.PlayerConfirmationRepository;
 import com.example.demo.scrim.repository.ScrimRepository;
 import com.example.demo.scrim.specification.ScrimSpecification;
 import com.example.demo.team.entity.Team;
+import com.example.demo.tier.entity.Tier;
+import com.example.demo.tier.repository.TierRepository;
 import com.example.demo.user.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -42,6 +46,12 @@ public class ScrimService {
     private GameRepository gameRepository;
 
     @Autowired
+    private TierRepository tierRepository;
+
+    @Autowired
+    private RegionRepository regionRepository;
+
+    @Autowired
     private PlayerConfirmationRepository confirmationRepository;
 
     @Transactional(readOnly = true)
@@ -55,9 +65,9 @@ public class ScrimService {
     public List<ScrimResponse> searchScrims(ScrimSearchRequest searchRequest) {
         Specification<Scrim> spec = Specification.where(ScrimSpecification.hasGameId(searchRequest.getGameId()))
                 .and(ScrimSpecification.hasFormatType(searchRequest.getFormatType()))
-                .and(ScrimSpecification.hasRegion(searchRequest.getRegion()))
-                .and(ScrimSpecification.hasMinTier(searchRequest.getMinTier()))
-                .and(ScrimSpecification.hasMaxTier(searchRequest.getMaxTier()))
+                .and(ScrimSpecification.hasRegionId(searchRequest.getRegionId()))
+                .and(ScrimSpecification.hasMinTier(searchRequest.getMinTierId()))
+                .and(ScrimSpecification.hasMaxTier(searchRequest.getMaxTierId()))
                 .and(ScrimSpecification.hasStatus(searchRequest.getStatus()));
 
         return scrimRepository.findAll(spec).stream()
@@ -73,7 +83,8 @@ public class ScrimService {
     }
 
     @Transactional
-    public ScrimResponse createScrim(String formatType, Long gameId, String minTier, String maxTier, String region, LocalDateTime scheduledTime) {
+    public ScrimResponse createScrim(String formatType, Long gameId, Long minTierId, Long maxTierId, Long regionId,
+            LocalDateTime scheduledTime) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof User)) {
             throw new RuntimeException("User not authenticated");
@@ -87,6 +98,36 @@ public class ScrimService {
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new RuntimeException("Game not found with id: " + gameId));
 
+        Tier minTier = null;
+        if (minTierId != null) {
+            minTier = tierRepository.findById(minTierId)
+                    .orElseThrow(() -> new RuntimeException("Min tier not found with id: " + minTierId));
+
+            if (!minTier.getGame().getGameId().equals(gameId)) {
+                throw new RuntimeException("Min tier does not belong to the selected game");
+            }
+        }
+
+        Tier maxTier = null;
+        if (maxTierId != null) {
+            maxTier = tierRepository.findById(maxTierId)
+                    .orElseThrow(() -> new RuntimeException("Max tier not found with id: " + maxTierId));
+
+            if (!maxTier.getGame().getGameId().equals(gameId)) {
+                throw new RuntimeException("Max tier does not belong to the selected game");
+            }
+        }
+
+        if (minTier != null && maxTier != null && minTier.getRank() > maxTier.getRank()) {
+            throw new RuntimeException("Min tier cannot be higher than max tier");
+        }
+
+        Region region = null;
+        if (regionId != null) {
+            region = regionRepository.findById(regionId)
+                    .orElseThrow(() -> new RuntimeException("Region not found with id: " + regionId));
+        }
+
         if (scheduledTime == null) {
             scheduledTime = LocalDateTime.now().plusHours(1);
         }
@@ -95,7 +136,8 @@ public class ScrimService {
 
         if (!scrim.isPlayerEligible(profile)) {
             throw new RuntimeException(
-                    "Your tier (" + profile.getTier() + ") is not within the required range for this scrim");
+                    "Your tier (" + profile.getMainTier().getTierName()
+                            + ") is not within the required range for this scrim");
         }
 
         boolean added = scrim.addPlayerToLobby(profile);
@@ -111,13 +153,13 @@ public class ScrimService {
         autoFillLobby(savedScrim);
 
         savedScrim = scrimRepository.save(savedScrim);
-        
+
         if (savedScrim.isLobbyFull()) {
             savedScrim.setState(ScrimStateFactory.fromStatus(ScrimStatus.LOBBYREADY));
             savedScrim = scrimRepository.save(savedScrim);
             createConfirmationRecords(savedScrim);
         }
-        
+
         return toResponse(savedScrim);
     }
 
@@ -150,7 +192,8 @@ public class ScrimService {
                 rangeMessage = "at most " + scrim.getMaxTier();
             }
             throw new RuntimeException(
-                    "Your tier (" + profile.getTier() + ") does not meet the requirements. Required: " + rangeMessage);
+                    "Your tier (" + profile.getMainTier().getTierName() + ") does not meet the requirements. Required: "
+                            + rangeMessage);
         }
 
         try {
@@ -225,8 +268,7 @@ public class ScrimService {
                         c.getProfile().getProfileId(),
                         c.getProfile().getUser().getUsername(),
                         c.getConfirmed(),
-                        c.getConfirmedAt()
-                ))
+                        c.getConfirmedAt()))
                 .collect(Collectors.toList());
     }
 
@@ -273,7 +315,8 @@ public class ScrimService {
         }
 
         if (scrim.getStatus() != ScrimStatus.CONFIRMED) {
-            throw new RuntimeException("Scrim must be in CONFIRMED state to start. Current status: " + scrim.getStatus());
+            throw new RuntimeException(
+                    "Scrim must be in CONFIRMED state to start. Current status: " + scrim.getStatus());
         }
 
         scrim.setState(ScrimStateFactory.fromStatus(ScrimStatus.INGAME));
@@ -303,8 +346,9 @@ public class ScrimService {
         }
 
         List<Profile> availableProfiles = profileRepository.findByMainGameAndStatus(
-                scrim.getGame().getGameName(),
-                ProfileStatus.AVAILABLE);
+                scrim.getGame(), 
+                ProfileStatus.AVAILABLE
+        );
 
         List<Profile> eligibleProfiles = availableProfiles.stream()
                 .filter(scrim::isPlayerEligible)
@@ -377,9 +421,12 @@ public class ScrimService {
                 scrim.isLobbyFull(),
                 scrim.getGame() != null ? scrim.getGame().getGameId() : null,
                 scrim.getGame() != null ? scrim.getGame().getGameName() : null,
-                scrim.getMinTier(),
-                scrim.getMaxTier(),
-                scrim.getRegion());
+                scrim.getMinTier() != null ? scrim.getMinTier().getTierId() : null,
+                scrim.getMinTier() != null ? scrim.getMinTier().getTierName() : null,
+                scrim.getMaxTier() != null ? scrim.getMaxTier().getTierId() : null,
+                scrim.getMaxTier() != null ? scrim.getMaxTier().getTierName() : null,
+                scrim.getRegion() != null ? scrim.getRegion().getRegionId() : null,
+                scrim.getRegion() != null ? scrim.getRegion().getRegionName() : null);
 
         response.setScheduledTime(scrim.getScheduledTime());
 

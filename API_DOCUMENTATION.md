@@ -13,20 +13,23 @@
 **Description:** Register a new user in the system.
 
 **Headers:**
+
 ```
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
-  "username": "string",     // Required, 3-100 characters, alphanumeric + underscore
-  "email": "string",        // Required, valid email format, max 255 characters
-  "password": "string"      // Required
+  "username": "string", // Required, 3-100 characters, alphanumeric + underscore
+  "email": "string", // Required, valid email format, max 255 characters
+  "password": "string" // Required
 }
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -36,6 +39,7 @@ Content-Type: application/json
 ```
 
 **Error Response (400 Bad Request):**
+
 ```json
 {
   "status": 400,
@@ -45,6 +49,7 @@ Content-Type: application/json
 ```
 
 **Validation Rules:**
+
 - `username`: 3-100 chars, only letters, numbers, underscore
 - `email`: Valid email format
 - `password`: Required
@@ -58,19 +63,22 @@ Content-Type: application/json
 **Description:** Authenticate user and receive JWT token.
 
 **Headers:**
+
 ```
 Content-Type: application/json
 ```
 
 **Request Body:**
+
 ```json
 {
-  "email": "string",        // Required
-  "password": "string"      // Required
+  "email": "string", // Required
+  "password": "string" // Required
 }
 ```
 
 **Response (200 OK):**
+
 ```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -80,11 +88,223 @@ Content-Type: application/json
 ```
 
 **Error Response (401 Unauthorized):**
+
 ```json
 {
   "status": 401,
   "error": "Unauthorized",
   "message": "Invalid credentials"
+}
+```
+
+---
+
+## 👤 Profile Endpoints
+
+> **Note:** All profile endpoints require authentication.  
+> Include the JWT token in the Authorization header: `Authorization: Bearer {token}`
+
+---
+
+### 3. Create Profile
+
+**Endpoint:** `POST /api/profile`
+
+**Description:** Create a profile for the authenticated user. Each user can only have one profile.
+
+**Headers:**
+
+```
+Content-Type: application/json
+Authorization: Bearer {token}
+```
+
+**Request Body:**
+
+```json
+{
+  "mainGameId": 1,      // Required, Long (game ID)
+  "tierId": 4,          // Required, Long (tier ID)
+  "region": "string"    // Required
+}
+```
+
+**Example:**
+
+```json
+{
+  "mainGame": "Valorant",
+  "tier": "Gold",
+  "region": "LATAM-SUR"
+}
+```
+
+**Response (201 Created):**
+
+```json
+{
+  "profileId": 1,
+  "userId": 5,
+  "username": "john_doe",
+  "mainGame": "Valorant",
+  "tier": "Gold",
+  "region": "LATAM-SUR",
+  "status": "AVAILABLE"
+}
+```
+
+**Error Responses:**
+
+```json
+// 400 - Profile already exists
+{
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Profile already exists for this user"
+}
+
+// 401 - Not authenticated
+{
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "User not authenticated"
+}
+```
+
+**Validation Rules:**
+
+- `mainGameId`: Required, must be a valid game ID
+- `tierId`: Required, must be a valid tier ID for the selected game
+- `region`: Required, not blank
+
+**Important:** The system validates that the tier belongs to the selected game.
+
+---
+
+### 4. Update Profile
+
+**Endpoint:** `PUT /api/profile`
+
+**Description:** Update the authenticated user's profile. All fields are optional - only provided fields will be updated.
+
+**Headers:**
+
+```
+Content-Type: application/json
+Authorization: Bearer {token}
+```
+
+**Request Body:**
+
+```json
+{
+  "mainGame": "string", // Optional
+  "tier": "string", // Optional
+  "region": "string" // Optional
+}
+```
+
+**Example - Update only tier:**
+
+```json
+{
+  "tier": "Platinum"
+}
+```
+
+**Example - Update all fields:**
+
+```json
+{
+  "mainGame": "League of Legends",
+  "tier": "Diamond",
+  "region": "NA"
+}
+```
+
+**Response (200 OK):**
+
+```json
+{
+  "profileId": 1,
+  "userId": 5,
+  "username": "john_doe",
+  "mainGame": "League of Legends",
+  "tier": "Diamond",
+  "region": "NA",
+  "status": "AVAILABLE"
+}
+```
+
+**Error Responses:**
+
+```json
+// 400 - Profile not found
+{
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Profile not found for user: john_doe"
+}
+
+// 400 - Cannot update while in scrim
+{
+  "status": 400,
+  "error": "Bad Request",
+  "message": "Cannot update profile while in a scrim. Status: BUSY"
+}
+
+// 401 - Not authenticated
+{
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "User not authenticated"
+}
+```
+
+**Behavior:**
+
+- Only updates fields that are provided (not null)
+- Cannot update profile while status is `BUSY` (in a scrim)
+- Profile must exist before updating
+
+---
+
+### 5. Get My Profile
+
+**Endpoint:** `GET /api/profile`
+
+**Description:** Get the authenticated user's profile information.
+
+**Headers:**
+
+```
+Content-Type: application/json
+Authorization: Bearer {token}
+```
+
+**Request Body:** None
+
+**Response (200 OK):**
+
+```json
+{
+  "profileId": 1,
+  "userId": 5,
+  "username": "john_doe",
+  "mainGame": "Valorant",
+  "tier": "Gold",
+  "region": "LATAM-SUR",
+  "status": "AVAILABLE"
+}
+```
+
+**Error Response (404 Not Found):**
+
+```json
+{
+  "status": 404,
+  "error": "Not Found",
+  "message": "Profile not found for user: john_doe"
 }
 ```
 
@@ -97,18 +317,20 @@ Content-Type: application/json
 
 ---
 
-### 3. Search Scrims
+### 6. Search Scrims
 
 **Endpoint:** `GET /api/scrim`
 
 **Description:** Search scrims with optional filters. Returns all scrims if no filters provided.
 
 **Headers:**
+
 ```
 Content-Type: application/json
 ```
 
 **Query Parameters:** (All optional)
+
 ```
 ?gameId=1
 &formatType=5v5
@@ -119,6 +341,7 @@ Content-Type: application/json
 ```
 
 **Parameters:**
+
 - `gameId` (Long): Filter by game ID
 - `formatType` (String): Filter by format (`1v1`, `3v3`, `5v5`)
 - `region` (String): Filter by region
@@ -127,6 +350,7 @@ Content-Type: application/json
 - `status` (String): Filter by status (`SEARCHING`, `LOBBYREADY`, `CONFIRMED`, `INGAME`, `FINISHED`, `CANCELLED`)
 
 **Response (200 OK):**
+
 ```json
 [
   {
@@ -136,8 +360,10 @@ Content-Type: application/json
     "lobbyFull": false,
     "gameId": 1,
     "gameName": "Valorant",
-    "minTier": "Gold",
-    "maxTier": "Platinum",
+    "minTierId": 4,
+    "minTierName": "Gold",
+    "maxTierId": 5,
+    "maxTierName": "Platinum",
     "region": "LATAM-SUR",
     "scheduledTime": "2025-11-09T19:00:00",
     "totalPlayers": null,
@@ -147,6 +373,7 @@ Content-Type: application/json
 ```
 
 **Example Requests:**
+
 ```bash
 # Get all scrims
 GET /api/scrim
@@ -157,37 +384,40 @@ GET /api/scrim?gameId=1
 # Get available 5v5 scrims in LATAM-SUR
 GET /api/scrim?formatType=5v5&region=LATAM-SUR&status=SEARCHING
 
-# Get Gold-Platinum scrims
-GET /api/scrim?minTier=Gold&maxTier=Platinum
+# Get Gold-Platinum scrims (using tier IDs)
+GET /api/scrim?minTierId=4&maxTierId=5
 ```
 
 ---
 
-### 4. Create Scrim
+### 7. Create Scrim
 
 **Endpoint:** `POST /api/scrim`
 
 **Description:** Create a new scrim. The creator is automatically added to the lobby and the system attempts to auto-fill with available players.
 
 **Headers:**
+
 ```
 Content-Type: application/json
 Authorization: Bearer {token}
 ```
 
 **Request Body:**
+
 ```json
 {
   "formatType": "string",          // Required, must be "1v1", "3v3", or "5v5"
   "gameId": 1,                     // Required, Long
-  "minTier": "string",             // Optional, minimum tier requirement
-  "maxTier": "string",             // Optional, maximum tier requirement
+  "minTierId": 4,                  // Optional, Long, minimum tier ID requirement
+  "maxTierId": 5,                  // Optional, Long, maximum tier ID requirement
   "region": "string",              // Optional, region
   "scheduledTime": "2025-11-09T19:00:00"  // Optional, ISO 8601 DateTime (default: now + 1 hour)
 }
 ```
 
 **Example - Basic:**
+
 ```json
 {
   "formatType": "5v5",
@@ -196,18 +426,20 @@ Authorization: Bearer {token}
 ```
 
 **Example - Complete:**
+
 ```json
 {
   "formatType": "5v5",
   "gameId": 1,
-  "minTier": "Gold",
-  "maxTier": "Platinum",
+  "minTierId": 4,
+  "maxTierId": 5,
   "region": "LATAM-SUR",
   "scheduledTime": "2025-11-09T20:00:00"
 }
 ```
 
 **Response (201 Created):**
+
 ```json
 {
   "scrimId": 5,
@@ -216,8 +448,10 @@ Authorization: Bearer {token}
   "lobbyFull": false,
   "gameId": 1,
   "gameName": "Valorant",
-  "minTier": "Gold",
-  "maxTier": "Platinum",
+  "minTierId": 4,
+  "minTierName": "Gold",
+  "maxTierId": 5,
+  "maxTierName": "Platinum",
   "region": "LATAM-SUR",
   "scheduledTime": "2025-11-09T20:00:00",
   "totalPlayers": null,
@@ -226,6 +460,7 @@ Authorization: Bearer {token}
 ```
 
 **Error Response (400 Bad Request):**
+
 ```json
 {
   "status": 400,
@@ -235,11 +470,15 @@ Authorization: Bearer {token}
 ```
 
 **Validation Rules:**
+
 - `formatType`: Must be `1v1`, `3v3`, or `5v5`
 - `gameId`: Must be a valid game ID
+- `minTierId` and `maxTierId`: Must be valid tier IDs that belong to the selected game
+- `minTier` cannot be higher than `maxTier` (validated by rank)
 - Creator's tier must be within `minTier` and `maxTier` range
 
 **Behavior:**
+
 - If `scheduledTime` is null → defaults to `now + 1 hour`
 - Creator is automatically added to the lobby
 - System auto-fills lobby with available and eligible players
@@ -247,21 +486,24 @@ Authorization: Bearer {token}
 
 ---
 
-### 5. Get Scrim by ID
+### 8. Get Scrim by ID
 
 **Endpoint:** `GET /api/scrim/{id}`
 
 **Description:** Get details of a specific scrim.
 
 **Headers:**
+
 ```
 Content-Type: application/json
 ```
 
 **Path Parameters:**
+
 - `id` (Long): Scrim ID
 
 **Response (200 OK):**
+
 ```json
 {
   "scrimId": 1,
@@ -280,6 +522,7 @@ Content-Type: application/json
 ```
 
 **Error Response (404 Not Found):**
+
 ```json
 {
   "status": 404,
@@ -290,24 +533,27 @@ Content-Type: application/json
 
 ---
 
-### 6. Apply to Scrim
+### 9. Apply to Scrim
 
 **Endpoint:** `POST /api/scrim/{id}/apply`
 
 **Description:** Apply to join an existing scrim. Player must meet tier requirements.
 
 **Headers:**
+
 ```
 Content-Type: application/json
 Authorization: Bearer {token}
 ```
 
 **Path Parameters:**
+
 - `id` (Long): Scrim ID
 
 **Request Body:** None
 
 **Response (200 OK):**
+
 ```json
 {
   "scrimId": 1,
@@ -326,6 +572,7 @@ Authorization: Bearer {token}
 ```
 
 **Error Responses:**
+
 ```json
 // 400 - Already in scrim
 {
@@ -350,6 +597,7 @@ Authorization: Bearer {token}
 ```
 
 **Behavior:**
+
 - Player's tier must be within `minTier` and `maxTier` range
 - Player is added to a random team (automatic balancing)
 - Player's profile status changes to `BUSY`
@@ -357,28 +605,31 @@ Authorization: Bearer {token}
 
 ---
 
-### 7. Confirm Participation
+### 10. Confirm Participation
 
 **Endpoint:** `POST /api/scrim/{id}/confirm`
 
 **Description:** Confirm participation in a scrim that is in LOBBYREADY state.
 
 **Headers:**
+
 ```
 Content-Type: application/json
 Authorization: Bearer {token}
 ```
 
 **Path Parameters:**
+
 - `id` (Long): Scrim ID
 
 **Request Body:** None
 
 **Response (200 OK):**
+
 ```json
 {
   "scrimId": 1,
-  "status": "CONFIRMED",  // or "INGAME" if scheduled time reached
+  "status": "CONFIRMED", // or "INGAME" if scheduled time reached
   "formatType": "5v5",
   "lobbyFull": true,
   "gameId": 1,
@@ -393,6 +644,7 @@ Authorization: Bearer {token}
 ```
 
 **Error Responses:**
+
 ```json
 // 400 - Wrong state
 {
@@ -417,6 +669,7 @@ Authorization: Bearer {token}
 ```
 
 **Behavior:**
+
 - Only works for scrims in `LOBBYREADY` state
 - If all players confirm:
   - **If `scheduledTime` > now:** → status becomes `CONFIRMED` (waiting)
@@ -424,22 +677,25 @@ Authorization: Bearer {token}
 
 ---
 
-### 8. Get Confirmations
+### 11. Get Confirmations
 
 **Endpoint:** `GET /api/scrim/{id}/confirmations`
 
 **Description:** Get confirmation status of all players in a scrim.
 
 **Headers:**
+
 ```
 Content-Type: application/json
 Authorization: Bearer {token}
 ```
 
 **Path Parameters:**
+
 - `id` (Long): Scrim ID
 
 **Response (200 OK):**
+
 ```json
 [
   {
@@ -464,6 +720,7 @@ Authorization: Bearer {token}
 ```
 
 **Error Response (404 Not Found):**
+
 ```json
 {
   "status": 404,
@@ -474,24 +731,27 @@ Authorization: Bearer {token}
 
 ---
 
-### 9. Cancel Scrim
+### 12. Cancel Scrim
 
 **Endpoint:** `POST /api/scrim/{id}/cancel`
 
 **Description:** Cancel a scrim. Only the creator can cancel.
 
 **Headers:**
+
 ```
 Content-Type: application/json
 Authorization: Bearer {token}
 ```
 
 **Path Parameters:**
+
 - `id` (Long): Scrim ID
 
 **Request Body:** None
 
 **Response (200 OK):**
+
 ```json
 {
   "scrimId": 1,
@@ -510,6 +770,7 @@ Authorization: Bearer {token}
 ```
 
 **Error Responses:**
+
 ```json
 // 400 - Not creator
 {
@@ -527,30 +788,34 @@ Authorization: Bearer {token}
 ```
 
 **Behavior:**
+
 - Only the creator can cancel
 - All players' profile status changes back to `AVAILABLE`
 - All confirmation records are deleted
 
 ---
 
-### 10. Finish Scrim
+### 13. Finish Scrim
 
 **Endpoint:** `POST /api/scrim/{id}/finish`
 
 **Description:** Mark a scrim as finished. Only works for scrims in INGAME state.
 
 **Headers:**
+
 ```
 Content-Type: application/json
 Authorization: Bearer {token}
 ```
 
 **Path Parameters:**
+
 - `id` (Long): Scrim ID
 
 **Request Body:** None
 
 **Response (200 OK):**
+
 ```json
 {
   "scrimId": 1,
@@ -569,6 +834,7 @@ Authorization: Bearer {token}
 ```
 
 **Error Response (400 Bad Request):**
+
 ```json
 {
   "status": 400,
@@ -578,6 +844,7 @@ Authorization: Bearer {token}
 ```
 
 **Behavior:**
+
 - Only works for scrims in `INGAME` state
 - All players' profile status changes back to `AVAILABLE`
 
@@ -594,6 +861,7 @@ CANCELLED                   CANCELLED                    CANCELLED
 ```
 
 **Status Transitions:**
+
 - `SEARCHING`: Initial state, accepting applications
 - `LOBBYREADY`: Lobby is full, waiting for confirmations
 - `CONFIRMED`: All players confirmed, waiting for scheduled time
@@ -606,6 +874,7 @@ CANCELLED                   CANCELLED                    CANCELLED
 ## 🔑 Common Error Responses
 
 ### 401 Unauthorized
+
 ```json
 {
   "status": 401,
@@ -615,19 +884,18 @@ CANCELLED                   CANCELLED                    CANCELLED
 ```
 
 ### 400 Validation Error
+
 ```json
 {
   "status": 400,
   "error": "Validation Error",
   "message": "Invalid input data",
-  "details": [
-    "Format type must be 1v1, 3v3, or 5v5",
-    "Game ID is required"
-  ]
+  "details": ["Format type must be 1v1, 3v3, or 5v5", "Game ID is required"]
 }
 ```
 
 ### 404 Not Found
+
 ```json
 {
   "status": 404,
@@ -637,6 +905,7 @@ CANCELLED                   CANCELLED                    CANCELLED
 ```
 
 ### 500 Internal Server Error
+
 ```json
 {
   "status": 500,
@@ -661,34 +930,44 @@ POST /api/auth/register
 }
 # Response: { "token": "eyJhbGci..." }
 
-# 2. Create Scrim
+# 2. Create Profile
+POST /api/profile
+Authorization: Bearer eyJhbGci...
+{
+  "mainGameId": 1,
+  "tierId": 4,
+  "region": "LATAM-SUR"
+}
+# Response: { "profileId": 1, "mainGameName": "Valorant", "tierName": "Gold", "status": "AVAILABLE" }
+
+# 3. Create Scrim
 POST /api/scrim
 Authorization: Bearer eyJhbGci...
 {
   "formatType": "5v5",
   "gameId": 1,
-  "minTier": "Gold",
-  "maxTier": "Platinum",
+  "minTierId": 4,
+  "maxTierId": 5,
   "region": "LATAM-SUR"
 }
 # Response: { "scrimId": 1, "status": "SEARCHING" }
 
-# 3. Another player applies
+# 4. Another player applies
 POST /api/scrim/1/apply
 Authorization: Bearer {other_player_token}
 # Response: { "status": "SEARCHING" or "LOBBYREADY" if full }
 
-# 4. Check confirmations (if LOBBYREADY)
+# 5. Check confirmations (if LOBBYREADY)
 GET /api/scrim/1/confirmations
 Authorization: Bearer eyJhbGci...
 # Response: [{ "username": "john_gamer", "confirmed": false }, ...]
 
-# 5. Confirm participation
+# 6. Confirm participation
 POST /api/scrim/1/confirm
 Authorization: Bearer eyJhbGci...
 # Response: { "status": "CONFIRMED" or "INGAME" }
 
-# 6. Finish game
+# 7. Finish game
 POST /api/scrim/1/finish
 Authorization: Bearer eyJhbGci...
 # Response: { "status": "FINISHED" }
@@ -698,17 +977,18 @@ Authorization: Bearer eyJhbGci...
 
 ## 🎯 Notes
 
-1. **Authentication:** All scrim endpoints (except GET search) require a valid JWT token
-2. **Profile Status:** Players are automatically marked as `BUSY` when joining a scrim and `AVAILABLE` when it finishes/is cancelled
-3. **Auto-fill:** When creating a scrim, the system automatically searches for available players matching the criteria
-4. **Scheduled Time:** If not provided, defaults to current time + 1 hour
-5. **Confirmation Logic:** 
+1. **Authentication:** All profile and scrim endpoints (except GET /api/scrim) require a valid JWT token
+2. **Profile Required:** You must create a profile before creating or joining scrims
+3. **Profile Status:** Players are automatically marked as `BUSY` when joining a scrim and `AVAILABLE` when it finishes/is cancelled
+4. **Profile Updates:** Cannot update profile while status is `BUSY` (in a scrim)
+5. **Auto-fill:** When creating a scrim, the system automatically searches for available players matching the criteria
+6. **Scheduled Time:** If not provided, defaults to current time + 1 hour
+7. **Confirmation Logic:**
    - If all players confirm before scheduled time → `CONFIRMED` (waiting)
    - If all players confirm after scheduled time → `INGAME` (start immediately)
-6. **Team Balancing:** Players are automatically distributed evenly across two teams
+8. **Team Balancing:** Players are automatically distributed evenly across two teams
 
 ---
 
 **Last Updated:** November 9, 2025  
 **API Version:** 1.0
-

@@ -29,17 +29,17 @@ public class ScrimController {
     public ResponseEntity<?> searchScrims(
             @RequestParam(required = false) Long gameId,
             @RequestParam(required = false) String formatType,
-            @RequestParam(required = false) String region,
-            @RequestParam(required = false) String minTier,
-            @RequestParam(required = false) String maxTier,
+            @RequestParam(required = false) Long regionId,
+            @RequestParam(required = false) Long minTierId,
+            @RequestParam(required = false) Long maxTierId,
             @RequestParam(required = false) ScrimStatus status) {
         try {
             ScrimSearchRequest searchRequest = new ScrimSearchRequest();
             searchRequest.setGameId(gameId);
             searchRequest.setFormatType(formatType);
-            searchRequest.setRegion(region);
-            searchRequest.setMinTier(minTier);
-            searchRequest.setMaxTier(maxTier);
+            searchRequest.setRegionId(regionId);
+            searchRequest.setMinTierId(minTierId);
+            searchRequest.setMaxTierId(maxTierId);
             searchRequest.setStatus(status);
 
             List<ScrimResponse> scrims = scrimService.searchScrims(searchRequest);
@@ -59,9 +59,9 @@ public class ScrimController {
             ScrimResponse scrim = scrimService.createScrim(
                     request.getFormatType(),
                     request.getGameId(),
-                    request.getMinTier(),
-                    request.getMaxTier(),
-                    request.getRegion(),
+                    request.getMinTierId(),
+                    request.getMaxTierId(),
+                    request.getRegionId(),
                     request.getScheduledTime());
             return ResponseEntity.status(HttpStatus.CREATED).body(scrim);
         } catch (RuntimeException e) {

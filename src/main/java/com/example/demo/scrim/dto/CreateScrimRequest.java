@@ -14,11 +14,11 @@ public class CreateScrimRequest {
     @NotNull(message = "Game ID is required")
     private Long gameId;
 
-    private String minTier;
+    private Long minTierId;
 
-    private String maxTier;
+    private Long maxTierId;
 
-    private String region;
+    private Long regionId;
 
     private LocalDateTime scheduledTime;
 
@@ -30,12 +30,12 @@ public class CreateScrimRequest {
         this.gameId = gameId;
     }
 
-    public CreateScrimRequest(String formatType, Long gameId, String minTier, String maxTier, String region, LocalDateTime scheduledTime) {
+    public CreateScrimRequest(String formatType, Long gameId, Long minTierId, Long maxTierId, Long regionId, LocalDateTime scheduledTime) {
         this.formatType = formatType;
         this.gameId = gameId;
-        this.minTier = minTier;
-        this.maxTier = maxTier;
-        this.region = region;
+        this.minTierId = minTierId;
+        this.maxTierId = maxTierId;
+        this.regionId = regionId;
         this.scheduledTime = scheduledTime;
     }
 
@@ -55,28 +55,28 @@ public class CreateScrimRequest {
         this.gameId = gameId;
     }
 
-    public String getMinTier() {
-        return minTier;
+    public Long getMinTierId() {
+        return minTierId;
     }
 
-    public void setMinTier(String minTier) {
-        this.minTier = minTier;
+    public void setMinTierId(Long minTierId) {
+        this.minTierId = minTierId;
     }
 
-    public String getMaxTier() {
-        return maxTier;
+    public Long getMaxTierId() {
+        return maxTierId;
     }
 
-    public void setMaxTier(String maxTier) {
-        this.maxTier = maxTier;
+    public void setMaxTierId(Long maxTierId) {
+        this.maxTierId = maxTierId;
     }
 
-    public String getRegion() {
-        return region;
+    public Long getRegionId() {
+        return regionId;
     }
 
-    public void setRegion(String region) {
-        this.region = region;
+    public void setRegionId(Long regionId) {
+        this.regionId = regionId;
     }
 
     public LocalDateTime getScheduledTime() {

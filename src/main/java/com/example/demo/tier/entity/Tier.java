@@ -4,7 +4,7 @@ import com.example.demo.game.entity.Game;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "tiers")
+@Table(name = "tiers", uniqueConstraints = @UniqueConstraint(columnNames = { "game_id", "tier_name" }))
 public class Tier {
 
     @Id
@@ -16,7 +16,7 @@ public class Tier {
     @JoinColumn(name = "game_id", nullable = false)
     private Game game;
 
-    @Column(name = "tier_name", nullable = false, unique = true, length = 100)
+    @Column(name = "tier_name", nullable = false, length = 100)
     private String tierName;
 
     @Column(name = "rank", nullable = false)
@@ -65,6 +65,7 @@ public class Tier {
 
     /**
      * Compares this tier with another tier based on rank
+     * 
      * @return positive if this tier is higher, negative if lower, 0 if equal
      */
     public int compareTo(Tier other) {

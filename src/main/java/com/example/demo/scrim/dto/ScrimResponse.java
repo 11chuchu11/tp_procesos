@@ -11,9 +11,12 @@ public class ScrimResponse {
     private boolean lobbyFull;
     private Long gameId;
     private String gameName;
-    private String minTier;
-    private String maxTier;
-    private String region;
+    private Long minTierId;
+    private String minTierName;
+    private Long maxTierId;
+    private String maxTierName;
+    private Long regionId;
+    private String regionName;
     private Integer totalPlayers;
     private Integer confirmedPlayers;
     private LocalDateTime scheduledTime;
@@ -21,16 +24,20 @@ public class ScrimResponse {
     public ScrimResponse() {
     }
 
-    public ScrimResponse(Long scrimId, ScrimStatus status, String formatType, boolean lobbyFull, Long gameId, String gameName, String minTier, String maxTier, String region) {
+    public ScrimResponse(Long scrimId, ScrimStatus status, String formatType, boolean lobbyFull, Long gameId, String gameName, 
+                        Long minTierId, String minTierName, Long maxTierId, String maxTierName, Long regionId, String regionName) {
         this.scrimId = scrimId;
         this.status = status;
         this.formatType = formatType;
         this.lobbyFull = lobbyFull;
         this.gameId = gameId;
         this.gameName = gameName;
-        this.minTier = minTier;
-        this.maxTier = maxTier;
-        this.region = region;
+        this.minTierId = minTierId;
+        this.minTierName = minTierName;
+        this.maxTierId = maxTierId;
+        this.maxTierName = maxTierName;
+        this.regionId = regionId;
+        this.regionName = regionName;
     }
 
     public Long getScrimId() {
@@ -81,28 +88,52 @@ public class ScrimResponse {
         this.gameName = gameName;
     }
 
-    public String getMinTier() {
-        return minTier;
+    public Long getMinTierId() {
+        return minTierId;
     }
 
-    public void setMinTier(String minTier) {
-        this.minTier = minTier;
+    public void setMinTierId(Long minTierId) {
+        this.minTierId = minTierId;
     }
 
-    public String getMaxTier() {
-        return maxTier;
+    public String getMinTierName() {
+        return minTierName;
     }
 
-    public void setMaxTier(String maxTier) {
-        this.maxTier = maxTier;
+    public void setMinTierName(String minTierName) {
+        this.minTierName = minTierName;
     }
 
-    public String getRegion() {
-        return region;
+    public Long getMaxTierId() {
+        return maxTierId;
     }
 
-    public void setRegion(String region) {
-        this.region = region;
+    public void setMaxTierId(Long maxTierId) {
+        this.maxTierId = maxTierId;
+    }
+
+    public String getMaxTierName() {
+        return maxTierName;
+    }
+
+    public void setMaxTierName(String maxTierName) {
+        this.maxTierName = maxTierName;
+    }
+
+    public Long getRegionId() {
+        return regionId;
+    }
+
+    public void setRegionId(Long regionId) {
+        this.regionId = regionId;
+    }
+
+    public String getRegionName() {
+        return regionName;
+    }
+
+    public void setRegionName(String regionName) {
+        this.regionName = regionName;
     }
 
     public Integer getTotalPlayers() {

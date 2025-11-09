@@ -12,6 +12,6 @@ CREATE INDEX idx_games_game_id ON games(game_id);
 
 -- Inserts
 INSERT INTO games (game_name) VALUES
-                                  ('League of Legends'),
-                                  ('Valorant'),
-                                  ('Dota 2');
+('League of Legends'),
+('Valorant'),
+('Dota 2');

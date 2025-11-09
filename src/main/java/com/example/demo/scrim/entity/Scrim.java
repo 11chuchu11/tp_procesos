@@ -8,6 +8,7 @@ import com.example.demo.Lobby.entity.Lobby;
 import com.example.demo.profile.entity.Profile;
 import com.example.demo.scrim.factory.ScrimStateFactory;
 import com.example.demo.scrim.state.ScrimState;
+import com.example.demo.tier.entity.Tier;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -45,14 +46,17 @@ public class Scrim {
     @Column(name = "format_type")
     private String formatType;
 
-    @Column(name = "min_tier")
-    private String minTier;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "min_tier_id")
+    private Tier minTier;
 
-    @Column(name = "max_tier")
-    private String maxTier;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "max_tier_id")
+    private Tier maxTier;
 
-    @Column(name = "region")
-    private String region;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id")
+    private com.example.demo.region.entity.Region region;
 
     @Column(name = "scheduled_time", nullable = false)
     private LocalDateTime scheduledTime;
@@ -72,8 +76,8 @@ public class Scrim {
         this.createdBy = createdBy;
     }
 
-    public Scrim(String formatType, Game game, com.example.demo.user.entity.User createdBy, String minTier,
-            String maxTier, String region, LocalDateTime scheduledTime) {
+    public Scrim(String formatType, Game game, com.example.demo.user.entity.User createdBy, Tier minTier,
+            Tier maxTier, com.example.demo.region.entity.Region region, LocalDateTime scheduledTime) {
         this.status = ScrimStatus.SEARCHING;
         this.state = ScrimStateFactory.fromStatus(this.status);
         this.formatType = formatType;
@@ -208,27 +212,27 @@ public class Scrim {
         this.createdBy = createdBy;
     }
 
-    public String getMinTier() {
+    public Tier getMinTier() {
         return minTier;
     }
 
-    public void setMinTier(String minTier) {
+    public void setMinTier(Tier minTier) {
         this.minTier = minTier;
     }
 
-    public String getMaxTier() {
+    public Tier getMaxTier() {
         return maxTier;
     }
 
-    public void setMaxTier(String maxTier) {
+    public void setMaxTier(Tier maxTier) {
         this.maxTier = maxTier;
     }
 
-    public String getRegion() {
+    public com.example.demo.region.entity.Region getRegion() {
         return region;
     }
 
-    public void setRegion(String region) {
+    public void setRegion(com.example.demo.region.entity.Region region) {
         this.region = region;
     }
 
@@ -249,23 +253,19 @@ public class Scrim {
             return true;
         }
 
-        String playerTier = profile.getTier();
+        Tier playerTier = profile.getMainTier();
         if (playerTier == null) {
             return false;
         }
 
-        if (minTier != null && maxTier == null) {
-            return compareTiers(playerTier, minTier) >= 0;
+        if (minTier != null && playerTier.getRank() < minTier.getRank()) {
+            return false;
         }
 
-        if (minTier == null && maxTier != null) {
-            return compareTiers(playerTier, maxTier) <= 0;
+        if (maxTier != null && playerTier.getRank() > maxTier.getRank()) {
+            return false;
         }
 
-        return compareTiers(playerTier, minTier) >= 0 && compareTiers(playerTier, maxTier) <= 0;
-    }
-
-    private int compareTiers(String tier1, String tier2) {
-        return tier1.compareToIgnoreCase(tier2);
+        return true;
     }
 }

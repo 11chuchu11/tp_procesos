@@ -27,30 +27,30 @@ public class ScrimSpecification {
         };
     }
 
-    public static Specification<Scrim> hasRegion(String region) {
+    public static Specification<Scrim> hasRegionId(Long regionId) {
         return (root, query, criteriaBuilder) -> {
-            if (region == null || region.isEmpty()) {
+            if (regionId == null) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.equal(root.get("region"), region);
+            return criteriaBuilder.equal(root.get("region").get("regionId"), regionId);
         };
     }
 
-    public static Specification<Scrim> hasMinTier(String minTier) {
+    public static Specification<Scrim> hasMinTier(Long minTierId) {
         return (root, query, criteriaBuilder) -> {
-            if (minTier == null || minTier.isEmpty()) {
+            if (minTierId == null) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.greaterThanOrEqualTo(root.get("minTier"), minTier);
+            return criteriaBuilder.equal(root.get("minTier").get("tierId"), minTierId);
         };
     }
 
-    public static Specification<Scrim> hasMaxTier(String maxTier) {
+    public static Specification<Scrim> hasMaxTier(Long maxTierId) {
         return (root, query, criteriaBuilder) -> {
-            if (maxTier == null || maxTier.isEmpty()) {
+            if (maxTierId == null) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.lessThanOrEqualTo(root.get("maxTier"), maxTier);
+            return criteriaBuilder.equal(root.get("maxTier").get("tierId"), maxTierId);
         };
     }
 

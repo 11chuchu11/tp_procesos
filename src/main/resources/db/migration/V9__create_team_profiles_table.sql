@@ -8,3 +8,4 @@ CREATE TABLE IF NOT EXISTS team_profiles (
 
 CREATE INDEX idx_team_profiles_team_id ON team_profiles(team_id);
 CREATE INDEX idx_team_profiles_profile_id ON team_profiles(profile_id);
+

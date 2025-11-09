@@ -15,17 +15,12 @@ CREATE INDEX idx_users_username ON users(username);
 
 -- Inserts
 INSERT INTO users (username, email, password, is_verify) VALUES
--- LOL
-('ShatteredBlade',      'shattered.blade@hotmail.com',     'Password123!', TRUE),
-('NebulaCaster',        'nebula.caster@hotmail.com',       'Password123!', TRUE),
-('CrimsonMarksman',     'crimson.marksman@gmail.com',    'Password123!', TRUE),
-('RustyLantern',        'rusty.lantern@gmail.com',       'Password123!', TRUE),
--- VALO
-
-('VandalVirtuoso',      'vandal.virtuoso@hotmail.com',     'Password123!', TRUE),
-('SilentCrosshair',     'silent.crosshair@gmail.com',    'Password123!', TRUE),
-
--- DOTA
-('ArcaneHarvester',     'arcane.harvester@hotmail.com',   'Password123!', true),
-('SoulbreakerPrime',    'soulbreaker.prime@gmail.com',  'Password123!', TRUE),
-('DivineTempest',       'divine.tempest@gmail.com',     'Password123!', TRUE);
+('ShatteredBlade','shattered.blade@hotmail.com','Password123!',TRUE),
+('NebulaCaster','nebula.caster@hotmail.com','Password123!',TRUE),
+('CrimsonMarksman','crimson.marksman@gmail.com','Password123!',TRUE),
+('RustyLantern','rusty.lantern@gmail.com','Password123!',TRUE),
+('VandalVirtuoso','vandal.virtuoso@hotmail.com','Password123!', TRUE),
+('SilentCrosshair','silent.crosshair@gmail.com','Password123!', TRUE),
+('ArcaneHarvester','arcane.harvester@hotmail.com','Password123!',TRUE),
+('SoulbreakerPrime','soulbreaker.prime@gmail.com','Password123!',TRUE),
+('DivineTempest','divine.tempest@gmail.com','Password123!',TRUE);

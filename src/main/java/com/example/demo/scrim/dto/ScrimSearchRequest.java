@@ -6,9 +6,9 @@ public class ScrimSearchRequest {
 
     private Long gameId;
     private String formatType;
-    private String region;
-    private String minTier;
-    private String maxTier;
+    private Long regionId;
+    private Long minTierId;
+    private Long maxTierId;
     private ScrimStatus status;
 
     public ScrimSearchRequest() {
@@ -30,28 +30,28 @@ public class ScrimSearchRequest {
         this.formatType = formatType;
     }
 
-    public String getRegion() {
-        return region;
+    public Long getRegionId() {
+        return regionId;
     }
 
-    public void setRegion(String region) {
-        this.region = region;
+    public void setRegionId(Long regionId) {
+        this.regionId = regionId;
     }
 
-    public String getMinTier() {
-        return minTier;
+    public Long getMinTierId() {
+        return minTierId;
     }
 
-    public void setMinTier(String minTier) {
-        this.minTier = minTier;
+    public void setMinTierId(Long minTierId) {
+        this.minTierId = minTierId;
     }
 
-    public String getMaxTier() {
-        return maxTier;
+    public Long getMaxTierId() {
+        return maxTierId;
     }
 
-    public void setMaxTier(String maxTier) {
-        this.maxTier = maxTier;
+    public void setMaxTierId(Long maxTierId) {
+        this.maxTierId = maxTierId;
     }
 
     public ScrimStatus getStatus() {
