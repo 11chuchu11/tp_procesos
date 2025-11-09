@@ -19,6 +19,9 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private JwtService jwtService;
+
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -36,12 +39,14 @@ public class AuthService {
         user.setIsVerify(false);
 
         User savedUser = userRepository.save(user);
+        String token = jwtService.generateToken(savedUser.getUsername());
 
         return new AuthResponse(
                 savedUser.getUserId(),
                 savedUser.getUsername(),
                 savedUser.getEmail(),
-                savedUser.getIsVerify());
+                savedUser.getIsVerify(),
+                token);
     }
 
     @Transactional(readOnly = true)
@@ -53,10 +58,13 @@ public class AuthService {
             throw new RuntimeException("Invalid email or password");
         }
 
+        String token = jwtService.generateToken(user.getUsername());
+
         return new AuthResponse(
                 user.getUserId(),
                 user.getUsername(),
                 user.getEmail(),
-                user.getIsVerify());
+                user.getIsVerify(),
+                token);
     }
 }

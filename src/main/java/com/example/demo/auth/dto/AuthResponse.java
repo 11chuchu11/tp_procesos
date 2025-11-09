@@ -6,15 +6,17 @@ public class AuthResponse {
     private String username;
     private String email;
     private Boolean isVerify;
+    private String token;
 
     public AuthResponse() {
     }
 
-    public AuthResponse(Long userId, String username, String email, Boolean isVerify) {
+    public AuthResponse(Long userId, String username, String email, Boolean isVerify, String token) {
         this.userId = userId;
         this.username = username;
         this.email = email;
         this.isVerify = isVerify;
+        this.token = token;
     }
 
     public Long getUserId() {
@@ -49,4 +51,11 @@ public class AuthResponse {
         this.isVerify = isVerify;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }

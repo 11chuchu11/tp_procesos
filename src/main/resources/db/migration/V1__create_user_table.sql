@@ -9,6 +9,18 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create indexs
+-- Create indexes
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_users_username ON users(username);
+
+-- Inserts
+INSERT INTO users (username, email, password, is_verify) VALUES
+('ShatteredBlade','shattered.blade@hotmail.com','Password123!',TRUE),
+('NebulaCaster','nebula.caster@hotmail.com','Password123!',TRUE),
+('CrimsonMarksman','crimson.marksman@gmail.com','Password123!',TRUE),
+('RustyLantern','rusty.lantern@gmail.com','Password123!',TRUE),
+('VandalVirtuoso','vandal.virtuoso@hotmail.com','Password123!', TRUE),
+('SilentCrosshair','silent.crosshair@gmail.com','Password123!', TRUE),
+('ArcaneHarvester','arcane.harvester@hotmail.com','Password123!',TRUE),
+('SoulbreakerPrime','soulbreaker.prime@gmail.com','Password123!',TRUE),
+('DivineTempest','divine.tempest@gmail.com','Password123!',TRUE);
