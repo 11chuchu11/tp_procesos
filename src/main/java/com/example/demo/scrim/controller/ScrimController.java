@@ -1,7 +1,10 @@
 package com.example.demo.scrim.controller;
 
+import com.example.demo.enums.ScrimStatus;
 import com.example.demo.scrim.dto.CreateScrimRequest;
+import com.example.demo.scrim.dto.PlayerConfirmationInfo;
 import com.example.demo.scrim.dto.ScrimResponse;
+import com.example.demo.scrim.dto.ScrimSearchRequest;
 import com.example.demo.scrim.service.ScrimService;
 import com.example.demo.shared.dto.ErrorResponse;
 import jakarta.validation.Valid;
@@ -23,9 +26,23 @@ public class ScrimController {
     private ScrimService scrimService;
 
     @GetMapping
-    public ResponseEntity<?> getAllScrims() {
+    public ResponseEntity<?> searchScrims(
+            @RequestParam(required = false) Long gameId,
+            @RequestParam(required = false) String formatType,
+            @RequestParam(required = false) String region,
+            @RequestParam(required = false) String minTier,
+            @RequestParam(required = false) String maxTier,
+            @RequestParam(required = false) ScrimStatus status) {
         try {
-            List<ScrimResponse> scrims = scrimService.getAllScrims();
+            ScrimSearchRequest searchRequest = new ScrimSearchRequest();
+            searchRequest.setGameId(gameId);
+            searchRequest.setFormatType(formatType);
+            searchRequest.setRegion(region);
+            searchRequest.setMinTier(minTier);
+            searchRequest.setMaxTier(maxTier);
+            searchRequest.setStatus(status);
+
+            List<ScrimResponse> scrims = scrimService.searchScrims(searchRequest);
             return ResponseEntity.ok(scrims);
         } catch (RuntimeException e) {
             ErrorResponse error = new ErrorResponse(
@@ -39,7 +56,13 @@ public class ScrimController {
     @PostMapping
     public ResponseEntity<?> createScrim(@Valid @RequestBody CreateScrimRequest request) {
         try {
-            ScrimResponse scrim = scrimService.createScrim(request.getFormatType(), request.getGameId());
+            ScrimResponse scrim = scrimService.createScrim(
+                    request.getFormatType(),
+                    request.getGameId(),
+                    request.getMinTier(),
+                    request.getMaxTier(),
+                    request.getRegion(),
+                    request.getScheduledTime());
             return ResponseEntity.status(HttpStatus.CREATED).body(scrim);
         } catch (RuntimeException e) {
             ErrorResponse error = new ErrorResponse(
@@ -79,9 +102,9 @@ public class ScrimController {
     }
 
     @PostMapping("/{id}/confirm")
-    public ResponseEntity<?> confirmScrim(@PathVariable Long id) {
+    public ResponseEntity<?> confirmParticipation(@PathVariable Long id) {
         try {
-            ScrimResponse scrim = scrimService.confirmScrim(id);
+            ScrimResponse scrim = scrimService.confirmParticipation(id);
             return ResponseEntity.ok(scrim);
         } catch (RuntimeException e) {
             ErrorResponse error = new ErrorResponse(
@@ -89,6 +112,20 @@ public class ScrimController {
                     "Bad Request",
                     e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+    }
+
+    @GetMapping("/{id}/confirmations")
+    public ResponseEntity<?> getConfirmations(@PathVariable Long id) {
+        try {
+            List<PlayerConfirmationInfo> confirmations = scrimService.getConfirmations(id);
+            return ResponseEntity.ok(confirmations);
+        } catch (RuntimeException e) {
+            ErrorResponse error = new ErrorResponse(
+                    HttpStatus.NOT_FOUND.value(),
+                    "Not Found",
+                    e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
         }
     }
 
@@ -137,4 +174,3 @@ public class ScrimController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 }
-

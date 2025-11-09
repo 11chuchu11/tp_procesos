@@ -5,7 +5,7 @@ import com.example.demo.scrim.entity.Scrim;
 import com.example.demo.scrim.factory.ScrimStateFactory;
 
 public class ConfirmedState implements ScrimState {
-    
+
     @Override
     public String getStateName() {
         return "CONFIRMED";
@@ -27,4 +27,3 @@ public class ConfirmedState implements ScrimState {
         unsupportedOperation("finish");
     }
 }
-

@@ -1,4 +1,4 @@
-package com.example.demo.lobby.entity;
+package com.example.demo.Lobby.entity;
 
 import com.example.demo.format.factory.FormatFactory;
 import com.example.demo.format.strategy.Format;

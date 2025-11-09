@@ -4,11 +4,12 @@ import com.example.demo.enums.ScrimStatus;
 import com.example.demo.format.factory.FormatFactory;
 import com.example.demo.format.strategy.Format;
 import com.example.demo.game.entity.Game;
-import com.example.demo.lobby.entity.Lobby;
+import com.example.demo.Lobby.entity.Lobby;
 import com.example.demo.profile.entity.Profile;
 import com.example.demo.scrim.factory.ScrimStateFactory;
 import com.example.demo.scrim.state.ScrimState;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "scrims")
@@ -34,24 +35,56 @@ public class Scrim {
     @JoinColumn(name = "game_id", nullable = false)
     private Game game;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by_user_id", nullable = false)
+    private com.example.demo.user.entity.User createdBy;
+
     @Transient
     private Format format;
 
     @Column(name = "format_type")
     private String formatType;
 
+    @Column(name = "min_tier")
+    private String minTier;
+
+    @Column(name = "max_tier")
+    private String maxTier;
+
+    @Column(name = "region")
+    private String region;
+
+    @Column(name = "scheduled_time", nullable = false)
+    private LocalDateTime scheduledTime;
+
     public Scrim() {
         this.status = ScrimStatus.SEARCHING;
         this.state = ScrimStateFactory.fromStatus(this.status);
     }
 
-    public Scrim(String formatType, Game game) {
+    public Scrim(String formatType, Game game, com.example.demo.user.entity.User createdBy) {
         this.status = ScrimStatus.SEARCHING;
         this.state = ScrimStateFactory.fromStatus(this.status);
         this.formatType = formatType;
         this.format = FormatFactory.fromString(formatType);
         this.lobby = new Lobby(formatType);
         this.game = game;
+        this.createdBy = createdBy;
+    }
+
+    public Scrim(String formatType, Game game, com.example.demo.user.entity.User createdBy, String minTier,
+            String maxTier, String region, LocalDateTime scheduledTime) {
+        this.status = ScrimStatus.SEARCHING;
+        this.state = ScrimStateFactory.fromStatus(this.status);
+        this.formatType = formatType;
+        this.format = FormatFactory.fromString(formatType);
+        this.lobby = new Lobby(formatType);
+        this.game = game;
+        this.createdBy = createdBy;
+        this.minTier = minTier;
+        this.maxTier = maxTier;
+        this.region = region;
+        this.scheduledTime = scheduledTime;
     }
 
     @PostLoad
@@ -87,7 +120,13 @@ public class Scrim {
         if (lobby == null) {
             return false;
         }
-        return lobby.addProfileRandomly(profile);
+        boolean added = lobby.addProfileRandomly(profile);
+        
+        if (added && isLobbyFull() && status == ScrimStatus.SEARCHING) {
+            setState(ScrimStateFactory.fromStatus(ScrimStatus.LOBBYREADY));
+        }
+        
+        return added;
     }
 
     public boolean isLobbyFull() {
@@ -159,5 +198,74 @@ public class Scrim {
 
     public void setGame(Game game) {
         this.game = game;
+    }
+
+    public com.example.demo.user.entity.User getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(com.example.demo.user.entity.User createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getMinTier() {
+        return minTier;
+    }
+
+    public void setMinTier(String minTier) {
+        this.minTier = minTier;
+    }
+
+    public String getMaxTier() {
+        return maxTier;
+    }
+
+    public void setMaxTier(String maxTier) {
+        this.maxTier = maxTier;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
+    public LocalDateTime getScheduledTime() {
+        return scheduledTime;
+    }
+
+    public void setScheduledTime(LocalDateTime scheduledTime) {
+        this.scheduledTime = scheduledTime;
+    }
+
+    public boolean isScheduledTimeReached() {
+        return scheduledTime != null && LocalDateTime.now().isAfter(scheduledTime);
+    }
+
+    public boolean isPlayerEligible(Profile profile) {
+        if (minTier == null && maxTier == null) {
+            return true;
+        }
+
+        String playerTier = profile.getTier();
+        if (playerTier == null) {
+            return false;
+        }
+
+        if (minTier != null && maxTier == null) {
+            return compareTiers(playerTier, minTier) >= 0;
+        }
+
+        if (minTier == null && maxTier != null) {
+            return compareTiers(playerTier, maxTier) <= 0;
+        }
+
+        return compareTiers(playerTier, minTier) >= 0 && compareTiers(playerTier, maxTier) <= 0;
+    }
+
+    private int compareTiers(String tier1, String tier2) {
+        return tier1.compareToIgnoreCase(tier2);
     }
 }

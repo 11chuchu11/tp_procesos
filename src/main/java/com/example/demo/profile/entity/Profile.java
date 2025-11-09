@@ -1,5 +1,6 @@
 package com.example.demo.profile.entity;
 
+import com.example.demo.enums.ProfileStatus;
 import com.example.demo.user.entity.User;
 import jakarta.persistence.*;
 
@@ -25,7 +26,12 @@ public class Profile {
     @Column(name = "region", nullable = false, length = 100)
     private String region;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private ProfileStatus status;
+
     public Profile() {
+        this.status = ProfileStatus.AVAILABLE;
     }
 
     public Profile(User user, String mainGame, String tier, String region) {
@@ -33,6 +39,7 @@ public class Profile {
         this.mainGame = mainGame;
         this.tier = tier;
         this.region = region;
+        this.status = ProfileStatus.AVAILABLE;
     }
 
     public Long getProfileId() {
@@ -73,5 +80,13 @@ public class Profile {
 
     public void setRegion(String region) {
         this.region = region;
+    }
+
+    public ProfileStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ProfileStatus status) {
+        this.status = status;
     }
 }

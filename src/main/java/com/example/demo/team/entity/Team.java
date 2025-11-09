@@ -2,7 +2,7 @@ package com.example.demo.team.entity;
 
 import com.example.demo.format.factory.FormatFactory;
 import com.example.demo.format.strategy.Format;
-import com.example.demo.lobby.entity.Lobby;
+import com.example.demo.Lobby.entity.Lobby;
 import com.example.demo.profile.entity.Profile;
 import jakarta.persistence.*;
 
