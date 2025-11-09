@@ -125,11 +125,11 @@ public class Scrim {
             return false;
         }
         boolean added = lobby.addProfileRandomly(profile);
-        
+
         if (added && isLobbyFull() && status == ScrimStatus.SEARCHING) {
             setState(ScrimStateFactory.fromStatus(ScrimStatus.LOBBYREADY));
         }
-        
+
         return added;
     }
 
@@ -147,7 +147,6 @@ public class Scrim {
         return lobby.isProfileInLobby(profile);
     }
 
-    // Getters and setters
     public Long getScrimId() {
         return scrimId;
     }

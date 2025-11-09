@@ -23,11 +23,7 @@ public class Team {
     private Lobby lobby;
 
     @ManyToMany
-    @JoinTable(
-        name = "team_profiles",
-        joinColumns = @JoinColumn(name = "team_id"),
-        inverseJoinColumns = @JoinColumn(name = "profile_id")
-    )
+    @JoinTable(name = "team_profiles", joinColumns = @JoinColumn(name = "team_id"), inverseJoinColumns = @JoinColumn(name = "profile_id"))
     private List<Profile> players;
 
     @Column(name = "format_type", nullable = false)
@@ -75,7 +71,6 @@ public class Team {
         return getCurrentSize() >= getMaxSize();
     }
 
-    // Getters and setters
     public Long getTeamId() {
         return teamId;
     }

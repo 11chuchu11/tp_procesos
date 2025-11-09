@@ -63,10 +63,10 @@ public class Lobby {
     private void initializeTeams() {
         Team team1 = new Team(formatType);
         Team team2 = new Team(formatType);
-        
+
         team1.setLobby(this);
         team2.setLobby(this);
-        
+
         teams.add(team1);
         teams.add(team2);
     }
@@ -76,26 +76,22 @@ public class Lobby {
             return false;
         }
 
-        // Try to balance teams
         Team team1 = teams.get(0);
         Team team2 = teams.get(1);
 
-        // If one team is full, add to the other
         if (team1.isFull() && !team2.isFull()) {
             return team2.addPlayer(profile);
         } else if (team2.isFull() && !team1.isFull()) {
             return team1.addPlayer(profile);
         }
 
-        // If both have space, randomly select
         int teamIndex = random.nextInt(2);
         Team selectedTeam = teams.get(teamIndex);
-        
+
         if (selectedTeam.addPlayer(profile)) {
             return true;
         }
 
-        // If selected team is full, try the other one
         Team otherTeam = teams.get(1 - teamIndex);
         return otherTeam.addPlayer(profile);
     }
@@ -130,7 +126,6 @@ public class Lobby {
         return false;
     }
 
-    // Getters and setters
     public Long getLobbyId() {
         return lobbyId;
     }

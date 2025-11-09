@@ -95,7 +95,10 @@ public class ScrimService {
         Profile profile = profileRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Profile not found for user: " + user.getUsername()));
 
-        // Obtener el gameId del perfil del usuario
+        if (profile.getStatus() != ProfileStatus.AVAILABLE) {
+            throw new RuntimeException("You are already in another scrim or busy.");
+        }
+
         Long gameId = profile.getMainGame().getGameId();
 
         Game game = gameRepository.findById(gameId)
@@ -178,25 +181,27 @@ public class ScrimService {
         Profile profile = profileRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Profile not found for user: " + user.getUsername()));
 
+        if (profile.getStatus() != ProfileStatus.AVAILABLE) {
+            throw new RuntimeException("You are already in another scrim or busy.");
+        }
+
         Scrim scrim = scrimRepository.findById(scrimId)
                 .orElseThrow(() -> new RuntimeException("Scrim not found with id: " + scrimId));
 
-        if (scrim.isProfileInLobby(profile)) {
-            throw new RuntimeException("You are already registered in this scrim");
+        if (scrim.getStatus() == ScrimStatus.CANCELLED || scrim.getStatus() == ScrimStatus.FINISHED
+                || scrim.getStatus() == ScrimStatus.INGAME) {
+            throw new RuntimeException("Cannot apply to a cancelled, finished or in-game scrim");
+        }
+
+        if (!profile.getMainGame().getGameId().equals(scrim.getGame().getGameId())) {
+            throw new RuntimeException(
+                    "Your profile is for " + profile.getMainGame().getGameName()
+                            + " but this scrim is for " + scrim.getGame().getGameName());
         }
 
         if (!scrim.isPlayerEligible(profile)) {
-            String rangeMessage = "";
-            if (scrim.getMinTier() != null && scrim.getMaxTier() != null) {
-                rangeMessage = "between " + scrim.getMinTier() + " and " + scrim.getMaxTier();
-            } else if (scrim.getMinTier() != null) {
-                rangeMessage = "at least " + scrim.getMinTier();
-            } else if (scrim.getMaxTier() != null) {
-                rangeMessage = "at most " + scrim.getMaxTier();
-            }
             throw new RuntimeException(
-                    "Your tier (" + profile.getMainTier().getTierName() + ") does not meet the requirements. Required: "
-                            + rangeMessage);
+                    "Your tier (" + profile.getMainTier().getTierName() + ") does not meet the requirements.");
         }
 
         try {
@@ -349,9 +354,8 @@ public class ScrimService {
         }
 
         List<Profile> availableProfiles = profileRepository.findByMainGameAndStatus(
-                scrim.getGame(), 
-                ProfileStatus.AVAILABLE
-        );
+                scrim.getGame(),
+                ProfileStatus.AVAILABLE);
 
         List<Profile> eligibleProfiles = availableProfiles.stream()
                 .filter(scrim::isPlayerEligible)

@@ -48,10 +48,10 @@ public class ProfileService {
         }
 
         Game game = gameRepository.findById(request.getMainGameId())
-                .orElseThrow(() -> new RuntimeException("Game not found with id: " + request.getMainGameId()));
+                .orElseThrow(() -> new RuntimeException("Game not found"));
 
         Tier tier = tierRepository.findById(request.getTierId())
-                .orElseThrow(() -> new RuntimeException("Tier not found with id: " + request.getTierId()));
+                .orElseThrow(() -> new RuntimeException("Tier not found"));
 
         if (!tier.getGame().getGameId().equals(game.getGameId())) {
             throw new RuntimeException("Tier does not belong to the selected game");
