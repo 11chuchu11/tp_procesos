@@ -11,9 +11,6 @@ public class CreateScrimRequest {
     @Pattern(regexp = "^(1v1|3v3|5v5)$", message = "Format type must be 1v1, 3v3, or 5v5")
     private String formatType;
 
-    @NotNull(message = "Game ID is required")
-    private Long gameId;
-
     private Long minTierId;
 
     private Long maxTierId;
@@ -25,14 +22,12 @@ public class CreateScrimRequest {
     public CreateScrimRequest() {
     }
 
-    public CreateScrimRequest(String formatType, Long gameId) {
+    public CreateScrimRequest(String formatType) {
         this.formatType = formatType;
-        this.gameId = gameId;
     }
 
-    public CreateScrimRequest(String formatType, Long gameId, Long minTierId, Long maxTierId, Long regionId, LocalDateTime scheduledTime) {
+    public CreateScrimRequest(String formatType, Long minTierId, Long maxTierId, Long regionId, LocalDateTime scheduledTime) {
         this.formatType = formatType;
-        this.gameId = gameId;
         this.minTierId = minTierId;
         this.maxTierId = maxTierId;
         this.regionId = regionId;
@@ -45,14 +40,6 @@ public class CreateScrimRequest {
 
     public void setFormatType(String formatType) {
         this.formatType = formatType;
-    }
-
-    public Long getGameId() {
-        return gameId;
-    }
-
-    public void setGameId(Long gameId) {
-        this.gameId = gameId;
     }
 
     public Long getMinTierId() {

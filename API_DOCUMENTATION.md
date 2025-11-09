@@ -394,7 +394,7 @@ GET /api/scrim?minTierId=4&maxTierId=5
 
 **Endpoint:** `POST /api/scrim`
 
-**Description:** Create a new scrim. The creator is automatically added to the lobby and the system attempts to auto-fill with available players.
+**Description:** Create a new scrim. The creator is automatically added to the lobby and the system attempts to auto-fill with available players. The game for the scrim is automatically taken from the creator's profile main game.
 
 **Headers:**
 
@@ -408,10 +408,9 @@ Authorization: Bearer {token}
 ```json
 {
   "formatType": "string",          // Required, must be "1v1", "3v3", or "5v5"
-  "gameId": 1,                     // Required, Long
   "minTierId": 4,                  // Optional, Long, minimum tier ID requirement
   "maxTierId": 5,                  // Optional, Long, maximum tier ID requirement
-  "region": "string",              // Optional, region
+  "regionId": 1,                   // Optional, Long, region ID
   "scheduledTime": "2025-11-09T19:00:00"  // Optional, ISO 8601 DateTime (default: now + 1 hour)
 }
 ```
@@ -420,8 +419,7 @@ Authorization: Bearer {token}
 
 ```json
 {
-  "formatType": "5v5",
-  "gameId": 1
+  "formatType": "5v5"
 }
 ```
 
@@ -430,10 +428,9 @@ Authorization: Bearer {token}
 ```json
 {
   "formatType": "5v5",
-  "gameId": 1,
   "minTierId": 4,
   "maxTierId": 5,
-  "region": "LATAM-SUR",
+  "regionId": 1,
   "scheduledTime": "2025-11-09T20:00:00"
 }
 ```

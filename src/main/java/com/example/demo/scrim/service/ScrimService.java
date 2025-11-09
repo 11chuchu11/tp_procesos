@@ -83,7 +83,7 @@ public class ScrimService {
     }
 
     @Transactional
-    public ScrimResponse createScrim(String formatType, Long gameId, Long minTierId, Long maxTierId, Long regionId,
+    public ScrimResponse createScrim(String formatType, Long minTierId, Long maxTierId, Long regionId,
             LocalDateTime scheduledTime) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof User)) {
@@ -94,6 +94,9 @@ public class ScrimService {
 
         Profile profile = profileRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Profile not found for user: " + user.getUsername()));
+
+        // Obtener el gameId del perfil del usuario
+        Long gameId = profile.getMainGame().getGameId();
 
         Game game = gameRepository.findById(gameId)
                 .orElseThrow(() -> new RuntimeException("Game not found with id: " + gameId));

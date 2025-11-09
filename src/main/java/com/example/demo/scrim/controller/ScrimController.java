@@ -58,7 +58,6 @@ public class ScrimController {
         try {
             ScrimResponse scrim = scrimService.createScrim(
                     request.getFormatType(),
-                    request.getGameId(),
                     request.getMinTierId(),
                     request.getMaxTierId(),
                     request.getRegionId(),
