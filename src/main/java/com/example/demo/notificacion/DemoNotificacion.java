@@ -1,9 +1,9 @@
 package com.example.demo.notificacion;
 
 import com.example.demo.notificacion.adapter.AdapterJavaPush;
-import com.example.demo.notificacion.adapter.IEstrategiaNotificacion;
-import com.example.demo.notificacion.entity.NotificacionEmail;
-import com.example.demo.notificacion.entity.NotificacionPush;
+import com.example.demo.notificacion.strategy.IEstrategiaNotificacion;
+import com.example.demo.notificacion.strategy.NotificacionEmail;
+import com.example.demo.notificacion.strategy.NotificacionPush;
 import com.example.demo.notificacion.entity.Notificador;
 import com.example.demo.notificacion.factory.EmailAdapterFactory;
 import com.example.demo.notificacion.smtp.SmtpConfig;

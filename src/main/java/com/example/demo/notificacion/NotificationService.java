@@ -1,11 +1,12 @@
 package com.example.demo.notificacion;
 
 import com.example.demo.notificacion.adapter.AdapterJavaPush;
-import com.example.demo.notificacion.entity.NotificacionEmail;
-import com.example.demo.notificacion.entity.NotificacionPush;
+import com.example.demo.notificacion.strategy.NotificacionEmail;
+import com.example.demo.notificacion.strategy.NotificacionPush;
 import com.example.demo.notificacion.entity.Notificador;
 import com.example.demo.notificacion.factory.EmailAdapterFactory;
 import com.example.demo.notificacion.smtp.SmtpConfig;
+import com.example.demo.notificacion.strategy.IEstrategiaNotificacion;
 import com.example.demo.scrim.entity.Scrim;
 import com.example.demo.profile.entity.Profile;
 import com.example.demo.user.entity.User;
@@ -49,7 +50,7 @@ public class NotificationService {
         NotificacionEmail emailStrategy = new NotificacionEmail(factory);
         NotificacionPush pushStrategy = new NotificacionPush(new AdapterJavaPush());
 
-        List<com.example.demo.notificacion.adapter.IEstrategiaNotificacion> estrategias = new ArrayList<>();
+        List<IEstrategiaNotificacion> estrategias = new ArrayList<>();
         estrategias.add(emailStrategy);
         estrategias.add(pushStrategy);
 

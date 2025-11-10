@@ -1,8 +1,7 @@
-package com.example.demo.notificacion.entity;
+package com.example.demo.notificacion.strategy;
 
 
 import com.example.demo.notificacion.adapter.IAdapterEmail;
-import com.example.demo.notificacion.adapter.IEstrategiaNotificacion;
 import com.example.demo.notificacion.factory.EmailAdapterFactory;
 import com.example.demo.user.entity.User;
 
