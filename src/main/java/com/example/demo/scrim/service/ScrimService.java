@@ -140,11 +140,15 @@ public class ScrimService {
                     .orElseThrow(() -> new RuntimeException("Region not found with id: " + regionId));
         }
 
-        if (scheduledTime == null) {
-            scheduledTime = LocalDateTime.now().plusMinutes(1);
-        }
-
-        Scrim scrim = new Scrim(formatType, game, user, minTier, maxTier, region, scheduledTime);
+        // ✨ Usar Builder Pattern en lugar de constructor
+        Scrim scrim = Scrim.builder()
+                .withFormatType(formatType)
+                .withGame(game)
+                .createdBy(user)
+                .withTierRange(minTier, maxTier) // Método de conveniencia
+                .withRegion(region)
+                .scheduledFor(scheduledTime) // Maneja null automáticamente
+                .build();
 
         if (!scrim.isPlayerEligible(profile)) {
             throw new RuntimeException(
@@ -160,13 +164,12 @@ public class ScrimService {
         profile.setStatus(ProfileStatus.BUSY);
         profileRepository.save(profile);
 
+        Scrim savedScrim = scrimRepository.save(scrim);
 
-    Scrim savedScrim = scrimRepository.save(scrim);
+        // notify users whose preferences match this scrim (available and eligible)
+        notifyMatchingUsersForScrim(savedScrim);
 
-    // notify users whose preferences match this scrim (available and eligible)
-    notifyMatchingUsersForScrim(savedScrim);
-
-    autoFillLobby(savedScrim);
+        autoFillLobby(savedScrim);
 
         savedScrim = scrimRepository.save(savedScrim);
 
@@ -235,7 +238,8 @@ public class ScrimService {
             // if applying filled the lobby, create confirmations and notify players
             if (savedScrim.getStatus() == ScrimStatus.LOBBYREADY) {
                 createConfirmationRecords(savedScrim);
-                notificationService.notifyPlayersInScrim(savedScrim, "Lobby is full for scrim " + savedScrim.getScrimId());
+                notificationService.notifyPlayersInScrim(savedScrim,
+                        "Lobby is full for scrim " + savedScrim.getScrimId());
             }
 
             return toResponse(savedScrim);
@@ -273,7 +277,6 @@ public class ScrimService {
         confirmation.setConfirmed(true);
         confirmation.setConfirmedAt(LocalDateTime.now());
         confirmationRepository.save(confirmation);
-
 
         if (allPlayersConfirmed(scrim)) {
             scrim.allPlayersConfirmed();
@@ -324,7 +327,8 @@ public class ScrimService {
             releaseProfilesFromScrim(scrim);
             Scrim savedScrim = scrimRepository.save(scrim);
             // notify involved players
-            notificationService.notifyPlayersInScrim(savedScrim, "Scrim " + savedScrim.getScrimId() + " has been cancelled");
+            notificationService.notifyPlayersInScrim(savedScrim,
+                    "Scrim " + savedScrim.getScrimId() + " has been cancelled");
             return toResponse(savedScrim);
         } catch (IllegalStateException e) {
             throw new RuntimeException("Cannot cancel scrim: " + e.getMessage());
@@ -440,25 +444,26 @@ public class ScrimService {
     }
 
     private void notifyMatchingUsersForScrim(Scrim scrim) {
-    // find available profiles for the same game and matching tiers/region
-    List<Profile> availableProfiles = profileRepository.findByMainGameAndStatus(
-        scrim.getGame(),
-        ProfileStatus.AVAILABLE);
+        // find available profiles for the same game and matching tiers/region
+        List<Profile> availableProfiles = profileRepository.findByMainGameAndStatus(
+                scrim.getGame(),
+                ProfileStatus.AVAILABLE);
 
-    List<Profile> eligibleProfiles = availableProfiles.stream()
-        .filter(scrim::isPlayerEligible)
-        .filter(profile -> !scrim.isProfileInLobby(profile))
-        .filter(profile -> !profile.getUser().getUserId().equals(scrim.getCreatedBy().getUserId()))
-        .collect(Collectors.toList());
+        List<Profile> eligibleProfiles = availableProfiles.stream()
+                .filter(scrim::isPlayerEligible)
+                .filter(profile -> !scrim.isProfileInLobby(profile))
+                .filter(profile -> !profile.getUser().getUserId().equals(scrim.getCreatedBy().getUserId()))
+                .collect(Collectors.toList());
 
         if (!eligibleProfiles.isEmpty()) {
-            // debug: show which users/emails we will notify
             System.out.println("Notifying eligible profiles for scrim " + scrim.getScrimId() + ":");
             eligibleProfiles.forEach(p -> {
-                if (p.getUser() != null) System.out.println(" - " + p.getUser().getUsername() + " <" + p.getUser().getEmail() + ">");
+                if (p.getUser() != null)
+                    System.out.println(" - " + p.getUser().getUsername() + " <" + p.getUser().getEmail() + ">");
             });
 
-            String mensaje = "New scrim created for " + (scrim.getGame() != null ? scrim.getGame().getGameName() : "your game")
+            String mensaje = "New scrim created for "
+                    + (scrim.getGame() != null ? scrim.getGame().getGameName() : "your game")
                     + ". Scrim id: " + scrim.getScrimId();
             notificationService.notifyProfiles(eligibleProfiles, mensaje);
         } else {

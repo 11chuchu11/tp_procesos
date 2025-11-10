@@ -6,6 +6,7 @@ import com.example.demo.format.strategy.Format;
 import com.example.demo.game.entity.Game;
 import com.example.demo.Lobby.entity.Lobby;
 import com.example.demo.profile.entity.Profile;
+import com.example.demo.scrim.builder.ScrimBuilder;
 import com.example.demo.scrim.factory.ScrimStateFactory;
 import com.example.demo.scrim.state.ScrimState;
 import com.example.demo.tier.entity.Tier;
@@ -89,6 +90,10 @@ public class Scrim {
         this.maxTier = maxTier;
         this.region = region;
         this.scheduledTime = scheduledTime;
+    }
+
+    public static ScrimBuilder builder() {
+        return new ScrimBuilder();
     }
 
     @PostLoad
