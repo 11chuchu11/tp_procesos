@@ -1,4 +1,4 @@
- package com.example.demo.scrim.repository;
+package com.example.demo.scrim.repository;
 
 import com.example.demo.enums.ScrimStatus;
 import com.example.demo.scrim.entity.Scrim;

@@ -8,6 +8,7 @@ import com.example.demo.profile.entity.Profile;
 import com.example.demo.profile.repository.ProfileRepository;
 import com.example.demo.region.entity.Region;
 import com.example.demo.region.repository.RegionRepository;
+import com.example.demo.schedule.ScrimSchedulerService;
 import com.example.demo.scrim.dto.PlayerConfirmationInfo;
 import com.example.demo.scrim.dto.ScrimResponse;
 import com.example.demo.scrim.dto.ScrimSearchRequest;
@@ -54,6 +55,9 @@ public class ScrimService {
     @Autowired
     private PlayerConfirmationRepository confirmationRepository;
 
+    @Autowired
+    private ScrimSchedulerService scrimSchedulerService;
+
     @Transactional(readOnly = true)
     public List<ScrimResponse> getAllScrims() {
         return scrimRepository.findAll().stream()
@@ -93,7 +97,7 @@ public class ScrimService {
         User user = (User) authentication.getPrincipal();
 
         Profile profile = profileRepository.findByUser(user)
-                .orElseThrow(() -> new RuntimeException("Profile not found for user: " + user.getUsername()));
+                .orElseThrow(() -> new RuntimeException("Profile not found"));
 
         if (profile.getStatus() != ProfileStatus.AVAILABLE) {
             throw new RuntimeException("You are already in another scrim or busy.");
@@ -102,12 +106,12 @@ public class ScrimService {
         Long gameId = profile.getMainGame().getGameId();
 
         Game game = gameRepository.findById(gameId)
-                .orElseThrow(() -> new RuntimeException("Game not found with id: " + gameId));
+                .orElseThrow(() -> new RuntimeException("Game not found"));
 
         Tier minTier = null;
         if (minTierId != null) {
             minTier = tierRepository.findById(minTierId)
-                    .orElseThrow(() -> new RuntimeException("Min tier not found with id: " + minTierId));
+                    .orElseThrow(() -> new RuntimeException("Min tier not found"));
 
             if (!minTier.getGame().getGameId().equals(gameId)) {
                 throw new RuntimeException("Min tier does not belong to the selected game");
@@ -117,7 +121,7 @@ public class ScrimService {
         Tier maxTier = null;
         if (maxTierId != null) {
             maxTier = tierRepository.findById(maxTierId)
-                    .orElseThrow(() -> new RuntimeException("Max tier not found with id: " + maxTierId));
+                    .orElseThrow(() -> new RuntimeException("Max tier not found"));
 
             if (!maxTier.getGame().getGameId().equals(gameId)) {
                 throw new RuntimeException("Max tier does not belong to the selected game");
@@ -135,7 +139,7 @@ public class ScrimService {
         }
 
         if (scheduledTime == null) {
-            scheduledTime = LocalDateTime.now().plusHours(1);
+            scheduledTime = LocalDateTime.now().plusMinutes(1);
         }
 
         Scrim scrim = new Scrim(formatType, game, user, minTier, maxTier, region, scheduledTime);
@@ -160,7 +164,11 @@ public class ScrimService {
 
         savedScrim = scrimRepository.save(savedScrim);
 
-        if (savedScrim.isLobbyFull()) {
+        scrimSchedulerService.scheduleScrim(savedScrim.getScrimId());
+
+        if (savedScrim.isLobbyFull() && savedScrim.getStatus() == ScrimStatus.LOBBYREADY) {
+            createConfirmationRecords(savedScrim);
+        } else if (savedScrim.isLobbyFull() && savedScrim.getStatus() == ScrimStatus.SEARCHING) {
             savedScrim.lobbyFilled();
             savedScrim = scrimRepository.save(savedScrim);
             createConfirmationRecords(savedScrim);
@@ -292,6 +300,8 @@ public class ScrimService {
             throw new RuntimeException("Only the creator can cancel this scrim");
         }
 
+        scrimSchedulerService.cancelScheduledTask(scrim.getScrimId());
+
         try {
             scrim.cancel();
             releaseProfilesFromScrim(scrim);
@@ -331,6 +341,40 @@ public class ScrimService {
         }
 
         return toResponse(scrim);
+    }
+
+    @Transactional
+    public void internalStartScrim(Long scrimId) {
+        Scrim scrim = scrimRepository.findById(scrimId)
+                .orElseThrow(() -> new RuntimeException("Scrim not found with id: " + scrimId));
+
+        if (scrim.getStatus() != ScrimStatus.CONFIRMED) {
+            throw new RuntimeException(
+                    "Scrim must be in CONFIRMED state to start. Current status: " + scrim.getStatus());
+        }
+
+        try {
+            scrim.start();
+            scrimRepository.save(scrim);
+            System.out.println("✅ Scrim " + scrimId + " iniciado automáticamente");
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Cannot start scrim: " + e.getMessage());
+        }
+    }
+
+    @Transactional
+    public void internalCancelScrim(Long scrimId) {
+        Scrim scrim = scrimRepository.findById(scrimId)
+                .orElseThrow(() -> new RuntimeException("Scrim not found with id: " + scrimId));
+
+        try {
+            scrim.cancel();
+            releaseProfilesFromScrim(scrim);
+            scrimRepository.save(scrim);
+            System.out.println("❌ Scrim " + scrimId + " cancelado automáticamente");
+        } catch (IllegalStateException e) {
+            throw new RuntimeException("Cannot cancel scrim: " + e.getMessage());
+        }
     }
 
     @Transactional
