@@ -1,6 +1,6 @@
 package com.example.demo.notificacion.entity;
 
-import com.example.demo.notificacion.adapter.IEstrategiaNotificacion;
+import com.example.demo.notificacion.strategy.IEstrategiaNotificacion;
 import com.example.demo.user.entity.User;
 
 import java.util.List;

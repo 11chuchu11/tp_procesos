@@ -1,4 +1,4 @@
-package com.example.demo.notificacion.adapter;
+package com.example.demo.notificacion.strategy;
 
 import com.example.demo.user.entity.User;
 
