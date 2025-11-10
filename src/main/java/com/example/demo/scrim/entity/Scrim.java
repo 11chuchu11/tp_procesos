@@ -283,12 +283,12 @@ public class Scrim {
         return true;
     }
 
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ss mm HH dd MM");
-    private String BeginScrim = scheduledTime.format(formatter);
+
+    private String BeginScrim = scheduledTime.format(DateTimeFormatter.ofPattern("ss mm HH dd MM"));
 
 
     @Scheduled(cron = "#{BeginScrim}")
     public void generarReportes() {
-        ;
+        System.out.println("Esta vivo brai");
     }
 }
