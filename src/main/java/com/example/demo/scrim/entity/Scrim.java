@@ -10,10 +10,7 @@ import com.example.demo.scrim.factory.ScrimStateFactory;
 import com.example.demo.scrim.state.ScrimState;
 import com.example.demo.tier.entity.Tier;
 import jakarta.persistence.*;
-import org.springframework.scheduling.annotation.Scheduled;
-
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Entity
 @Table(name = "scrims")
@@ -283,12 +280,4 @@ public class Scrim {
         return true;
     }
 
-
-    private String BeginScrim = scheduledTime.format(DateTimeFormatter.ofPattern("ss mm HH dd MM"));
-
-
-    @Scheduled(cron = "#{BeginScrim}")
-    public void generarReportes() {
-        System.out.println("Esta vivo brai");
-    }
 }
