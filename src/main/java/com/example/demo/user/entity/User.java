@@ -9,7 +9,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class User implements NotificacionObserver {
+public class User{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,7 +45,6 @@ public class User implements NotificacionObserver {
         updatedAt = LocalDateTime.now();
     }
 
-    private List<String> notificaciones = new ArrayList<>();
 
     public User() {
     }
@@ -113,12 +112,4 @@ public class User implements NotificacionObserver {
         this.updatedAt = updatedAt;
     }
 
-    public List<String> getNotificaciones() {
-        return notificaciones;
-    }
-
-    @Override
-    public void notificar(String mensaje) {
-        notificaciones.add(mensaje);
-    }
 }
