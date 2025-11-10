@@ -140,14 +140,13 @@ public class ScrimService {
                     .orElseThrow(() -> new RuntimeException("Region not found with id: " + regionId));
         }
 
-        // ✨ Usar Builder Pattern en lugar de constructor
         Scrim scrim = Scrim.builder()
                 .withFormatType(formatType)
                 .withGame(game)
                 .createdBy(user)
-                .withTierRange(minTier, maxTier) // Método de conveniencia
+                .withTierRange(minTier, maxTier)
                 .withRegion(region)
-                .scheduledFor(scheduledTime) // Maneja null automáticamente
+                .scheduledFor(scheduledTime)
                 .build();
 
         if (!scrim.isPlayerEligible(profile)) {
@@ -166,7 +165,6 @@ public class ScrimService {
 
         Scrim savedScrim = scrimRepository.save(scrim);
 
-        // notify users whose preferences match this scrim (available and eligible)
         notifyMatchingUsersForScrim(savedScrim);
 
         autoFillLobby(savedScrim);
@@ -281,7 +279,6 @@ public class ScrimService {
         if (allPlayersConfirmed(scrim)) {
             scrim.allPlayersConfirmed();
             scrim = scrimRepository.save(scrim);
-            // notify players that scrim is confirmed
             notificationService.notifyPlayersInScrim(scrim, "All players confirmed for scrim " + scrim.getScrimId());
         }
 
@@ -326,7 +323,6 @@ public class ScrimService {
             scrim.cancel();
             releaseProfilesFromScrim(scrim);
             Scrim savedScrim = scrimRepository.save(scrim);
-            // notify involved players
             notificationService.notifyPlayersInScrim(savedScrim,
                     "Scrim " + savedScrim.getScrimId() + " has been cancelled");
             return toResponse(savedScrim);
@@ -444,7 +440,6 @@ public class ScrimService {
     }
 
     private void notifyMatchingUsersForScrim(Scrim scrim) {
-        // find available profiles for the same game and matching tiers/region
         List<Profile> availableProfiles = profileRepository.findByMainGameAndStatus(
                 scrim.getGame(),
                 ProfileStatus.AVAILABLE);
