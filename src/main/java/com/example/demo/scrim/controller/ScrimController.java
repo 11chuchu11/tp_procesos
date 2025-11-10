@@ -142,6 +142,20 @@ public class ScrimController {
         }
     }
 
+    @PostMapping("/{id}/start")
+    public ResponseEntity<?> startScrim(@PathVariable Long id) {
+        try {
+            ScrimResponse scrim = scrimService.startScrim(id);
+            return ResponseEntity.ok(scrim);
+        } catch (RuntimeException e) {
+            ErrorResponse error = new ErrorResponse(
+                    HttpStatus.BAD_REQUEST.value(),
+                    "Bad Request",
+                    e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        }
+    }
+
     @PostMapping("/{id}/finish")
     public ResponseEntity<?> finishScrim(@PathVariable Long id) {
         try {
