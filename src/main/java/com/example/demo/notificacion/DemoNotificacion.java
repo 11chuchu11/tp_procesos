@@ -17,7 +17,7 @@ public class DemoNotificacion {
                 "smtp.gmail.com",     // host
                 465,               // 587 (STARTTLS) o 465 (SSL)
                 "manutest2799@gmail.com", // proveedor
-                "dhkjgqgwnlqftnat", // api password
+                "dhkjgqgwnlqftnat", // api passwordd
                 false,              // startTls (true si es 587)
                 true,             // ssl (true si es 465)
                 "manutest2799@gmail.com",   // FROM
