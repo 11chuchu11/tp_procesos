@@ -1,11 +1,15 @@
 package com.example.demo.user.entity;
 
+import com.example.demo.notificacion.adapter.IEstrategiaNotificacion;
+import com.example.demo.notificacion.entity.NotificacionObserver;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
-public class User {
+public class User{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,6 +44,7 @@ public class User {
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
     }
+
 
     public User() {
     }
@@ -106,4 +111,5 @@ public class User {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
 }
